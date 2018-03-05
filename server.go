@@ -2,16 +2,33 @@ package main
 
 import (
 	"fmt"
+	"github.com/labstack/echo"
+	"github.com/sclevine/agouti"
 	"net/http"
+	"os"
 
 	"github.com/gky360/atsrv/models"
-	"github.com/labstack/echo"
+	"github.com/gky360/atsrv/pages"
 )
 
 func main() {
+	e := echo.New()
+
 	// user := new(models.User)
 
-	e := echo.New()
+	driver := agouti.ChromeDriver()
+	if err := driver.Start(); err != nil {
+		e.Logger.Fatal("Could not start chrome driver")
+		e.Logger.Fatal(err)
+		os.Exit(1)
+	}
+	defer driver.Stop()
+	agoutiPage, err := driver.NewPage()
+	if err != nil {
+		e.Logger.Fatal("Could not create a page of chrome driver")
+		e.Logger.Fatal(err)
+		os.Exit(1)
+	}
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "atsrv is running!")
@@ -19,16 +36,20 @@ func main() {
 
 	e.POST("/login", func(c echo.Context) error {
 		fmt.Println("trying to login ...")
-		req_user := new(models.User)
-		if err := c.Bind(req_user); err != nil {
+		reqUser := new(models.User)
+		if err := c.Bind(reqUser); err != nil {
 			return err
 		}
 
-		// TODO: login
+		page, err := pages.NewTasksPage(agoutiPage)
+		if err != nil {
+			return err
+		}
+		fmt.Println(page.GetPage().Title())
 
-		res_user := *req_user
-		res_user.Password = ""
-		return c.JSON(http.StatusOK, res_user)
+		resUser := *reqUser
+		resUser.Password = ""
+		return c.JSON(http.StatusOK, resUser)
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))
