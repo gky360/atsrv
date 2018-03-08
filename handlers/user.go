@@ -28,3 +28,12 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	u.Password = "" // Don't send password
 	return c.JSON(http.StatusOK, u)
 }
+
+func (h *Handler) Logout(c echo.Context) (err error) {
+	fmt.Println("h.Logout")
+
+	// TODO: logout
+
+	u := new(models.User)
+	return c.JSON(http.StatusOK, u)
+}
