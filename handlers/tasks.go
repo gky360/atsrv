@@ -11,8 +11,14 @@ import (
 	"github.com/gky360/atsrv/models"
 )
 
-func (h *Handler) GetContest(c echo.Context) (err error) {
-	fmt.Println("h.GetContest")
+type (
+	RspGetTasks struct {
+		Tasks []models.Task `json:"tasks" yaml:"tasks"`
+	}
+)
+
+func (h *Handler) GetTasks(c echo.Context) (err error) {
+	fmt.Println("h.GetTasks")
 
 	contestID, err := paramContestID(c)
 	if err != nil {
@@ -21,15 +27,15 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	fmt.Println(contestID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "contest.yaml")
+	testFilePath := filepath.Join(h.PkgPath, "testdata", "tasks.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
 	}
-	contest := new(models.Contest)
-	if err = yaml.Unmarshal(buf, &contest); err != nil {
+	rsp := new(RspGetTasks)
+	if err = yaml.Unmarshal(buf, &rsp); err != nil {
 		panic(err)
 	}
 
-	return c.JSON(http.StatusOK, contest)
+	return c.JSON(http.StatusOK, rsp)
 }

@@ -41,7 +41,9 @@ func main() {
 	e.POST("/login", h.Login)
 	e.POST("/logout", h.Logout)
 
-	e.GET("/contests/:id", h.GetContest)
+	e.GET("/contests/:contestID", h.GetContest)
+
+	e.GET("/contests/:contestID/tasks", h.GetTasks)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

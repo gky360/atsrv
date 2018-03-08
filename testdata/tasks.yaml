@@ -1,0 +1,18 @@
+---
+tasks:
+- id: arc090_a
+  name: C
+  title: Candies
+  score: 300
+- id: arc090_b
+  name: D
+  title: People on a Line
+  score: 400
+- id: arc090_c
+  name: E
+  title: Avoiding Collision
+  score: 700
+- id: arc090_d
+  name: F
+  title: Number of Digits
+  score: 900

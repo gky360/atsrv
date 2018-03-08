@@ -1,8 +1,8 @@
 package models
 
 type Task struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Title    string `json:"title"`
-	FullName string `json:"full_name"`
+	ID    string `json:"id" yaml:"id"`
+	Name  string `json:"name" yaml:"name"`
+	Title string `json:"title" yaml:"title"`
+	Score int    `json:"score" yaml:"score"`
 }
