@@ -5,8 +5,8 @@ import (
 )
 
 type Contest struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string `json:"id" query:"id" yaml:"id"`
+	Name string `json:"name" query:"name" yaml:"name"`
 }
 
 func (c *Contest) Host() string {

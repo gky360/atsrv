@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/sclevine/agouti"
+	"path/filepath"
+	"runtime"
 
 	"github.com/gky360/atsrv/handlers"
 )
@@ -10,7 +12,11 @@ import (
 func main() {
 	e := echo.New()
 
-	// user := new(models.User)
+	_, ex, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("No caller information")
+	}
+	exPath := filepath.Dir(ex)
 
 	driver := agouti.ChromeDriver()
 	if err := driver.Start(); err != nil {
@@ -25,12 +31,16 @@ func main() {
 	}
 
 	h := &handlers.Handler{
-		Page: page,
+		PkgPath: exPath,
+		Page:    page,
 	}
 
 	// Routes
 	e.GET("/", h.Root)
+
 	e.POST("/login", h.Login)
+
+	e.GET("/contests/:id", h.GetContest)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
