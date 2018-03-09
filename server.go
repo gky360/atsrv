@@ -48,6 +48,7 @@ func main() {
 
 	e.GET("/contests/:contestID/tasks/:taskID/submissions", h.GetSubmissions)
 	e.GET("/contests/:contestID/tasks/:taskID/submissions/:submissionID", h.GetSubmission)
+	e.POST("/contests/:contestID/tasks/:taskID/submissions", h.PostSubmission)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

@@ -66,6 +66,28 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, rsp.Submissions[0])
 }
 
+func (h *Handler) PostSubmission(c echo.Context) (err error) {
+	fmt.Println("h.PostSubmission")
+
+	contestID, taskID, err := paramContestTaskID(c)
+	if err != nil {
+		return err
+	}
+	fmt.Println(contestID)
+	fmt.Println(taskID)
+	sbm := new(models.Submission)
+	if err = c.Bind(sbm); err != nil {
+		return err
+	}
+	if len(sbm.Source) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "source should not be empty.")
+	}
+
+	// TODO: access page
+
+	return c.JSON(http.StatusOK, sbm)
+}
+
 func paramContestTaskSubmissionID(c echo.Context) (
 	contestID, taskID, SubmissionID string,
 	err error,
