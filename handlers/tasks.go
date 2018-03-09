@@ -64,15 +64,15 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, rsp.Tasks[0])
 }
 
-func paramContestTaskID(c echo.Context) (string, string, error) {
-	contestID, err := paramContestID(c)
+func paramContestTaskID(c echo.Context) (contestID, taskID string, err error) {
+	contestID, err = paramContestID(c)
 	if err != nil {
-		return "", "", err
+		return
 	}
 
-	taskID := c.Param("taskID")
+	taskID = c.Param("taskID")
 	if len(taskID) == 0 {
-		return contestID, "", echo.NewHTTPError(http.StatusBadRequest, "task id should not be empty.")
+		err = echo.NewHTTPError(http.StatusBadRequest, "task id should not be empty.")
 	}
-	return contestID, taskID, nil
+	return
 }
