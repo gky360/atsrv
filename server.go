@@ -44,6 +44,7 @@ func main() {
 	e.GET("/contests/:contestID", h.GetContest)
 
 	e.GET("/contests/:contestID/tasks", h.GetTasks)
+	e.GET("/contests/:contestID/tasks/:taskID", h.GetTask)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
