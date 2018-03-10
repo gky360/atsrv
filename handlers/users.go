@@ -33,6 +33,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	}
 	pageObj, err := pages.NewTasksPage(page)
 	if err != nil {
+		stopPage(h, user.ID)
 		return err
 	}
 	fmt.Println(pageObj.GetPage().Title())
@@ -46,6 +47,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	claims["id"] = user.ID
 	user.Token, err = token.SignedString([]byte(h.jwtSecret))
 	if err != nil {
+		stopPage(h, user.ID)
 		return err
 	}
 
