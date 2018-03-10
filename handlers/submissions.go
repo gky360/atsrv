@@ -28,7 +28,7 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	fmt.Println(taskID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "submissions.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
@@ -53,7 +53,7 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	fmt.Println(submissionID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "submissions.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)

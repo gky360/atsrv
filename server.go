@@ -24,16 +24,8 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 	defer driver.Stop()
-	page, err := driver.NewPage()
-	if err != nil {
-		e.Logger.Error("Could not create a page of chrome driver")
-		e.Logger.Fatal(err)
-	}
 
-	h := &handlers.Handler{
-		PkgPath: exPath,
-		Page:    page,
-	}
+	h := handlers.NewHandler(exPath, driver)
 
 	// Routes
 	e.GET("/", h.Root)

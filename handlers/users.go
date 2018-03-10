@@ -17,11 +17,20 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return err
 	}
 
-	page, err := pages.NewTasksPage(h.Page)
+	// TODO: validate user
+
+	if err := startPage(h, u.ID); err != nil {
+		return err
+	}
+	page, err := getPage(h, u.ID)
 	if err != nil {
 		return err
 	}
-	fmt.Println(page.GetPage().Title())
+	pageObj, err := pages.NewTasksPage(page)
+	if err != nil {
+		return err
+	}
+	fmt.Println(pageObj.GetPage().Title())
 
 	// TODO: login
 
@@ -33,6 +42,7 @@ func (h *Handler) Logout(c echo.Context) (err error) {
 	fmt.Println("h.Logout")
 
 	// TODO: logout
+	// TODO: stop page
 
 	u := new(models.User)
 	return c.JSON(http.StatusOK, u)

@@ -27,7 +27,7 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 	fmt.Println(contestID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "tasks.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
@@ -51,7 +51,7 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 	fmt.Println(taskID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "tasks.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)

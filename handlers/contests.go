@@ -21,7 +21,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	fmt.Println(contestID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "contest.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "contest.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
