@@ -19,6 +19,11 @@ type (
 
 func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	fmt.Println("h.GetSubmissions")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, err := paramContestTaskID(c)
 	if err != nil {
@@ -43,6 +48,11 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 
 func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	fmt.Println("h.GetSubmission")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, submissionID, err := paramContestTaskSubmissionID(c)
 	if err != nil {
@@ -68,6 +78,11 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 
 func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	fmt.Println("h.PostSubmission")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, err := paramContestTaskID(c)
 	if err != nil {

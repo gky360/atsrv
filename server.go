@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
 	"path/filepath"
 	"runtime"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 	e := echo.New()
+	e.Logger.SetLevel(log.INFO)
 
 	_, ex, _, ok := runtime.Caller(0)
 	if !ok {

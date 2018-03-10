@@ -13,6 +13,11 @@ import (
 
 func (h *Handler) GetContest(c echo.Context) (err error) {
 	fmt.Println("h.GetContest")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, err := paramContestID(c)
 	if err != nil {
