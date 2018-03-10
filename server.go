@@ -49,6 +49,7 @@ func main() {
 
 	e.POST("/login", h.Login)
 	e.POST("/logout", h.Logout)
+	e.GET("/me", h.Me)
 
 	e.GET("/contests/:contestID", h.GetContest)
 

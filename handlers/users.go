@@ -67,6 +67,17 @@ func (h *Handler) Logout(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, models.User{ID: userID})
 }
 
+func (h *Handler) Me(c echo.Context) (err error) {
+	fmt.Println("h.Me")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
+
+	return c.JSON(http.StatusOK, user)
+}
+
 func userIDFromToken(c echo.Context) string {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
