@@ -19,6 +19,11 @@ type (
 
 func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	fmt.Println("h.GetSubmissions")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, err := paramContestTaskID(c)
 	if err != nil {
@@ -28,7 +33,7 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	fmt.Println(taskID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "submissions.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
@@ -43,6 +48,11 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 
 func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	fmt.Println("h.GetSubmission")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, submissionID, err := paramContestTaskSubmissionID(c)
 	if err != nil {
@@ -53,7 +63,7 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	fmt.Println(submissionID)
 
 	// TODO: access page
-	testFilePath := filepath.Join(h.PkgPath, "testdata", "submissions.yaml")
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
 	buf, err := ioutil.ReadFile(testFilePath)
 	if err != nil {
 		panic(err)
@@ -68,6 +78,11 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 
 func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	fmt.Println("h.PostSubmission")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
 
 	contestID, taskID, err := paramContestTaskID(c)
 	if err != nil {

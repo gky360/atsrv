@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
 	"path/filepath"
 	"runtime"
@@ -11,6 +13,7 @@ import (
 
 func main() {
 	e := echo.New()
+	e.Logger.SetLevel(log.INFO)
 
 	_, ex, _, ok := runtime.Caller(0)
 	if !ok {
@@ -24,22 +27,29 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 	defer driver.Stop()
-	page, err := driver.NewPage()
-	if err != nil {
-		e.Logger.Error("Could not create a page of chrome driver")
-		e.Logger.Fatal(err)
-	}
 
-	h := &handlers.Handler{
-		PkgPath: exPath,
-		Page:    page,
-	}
+	jwtSecret := []byte("hogehoge")
+	h := handlers.NewHandler(exPath, driver, jwtSecret)
+
+	// Middlewares
+	e.Use(middleware.Logger())
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte(jwtSecret),
+		Skipper: func(c echo.Context) bool {
+			if c.Path() == "/" || c.Path() == "/login" {
+				// Skip authentication for root and login requests
+				return true
+			}
+			return false
+		},
+	}))
 
 	// Routes
 	e.GET("/", h.Root)
 
 	e.POST("/login", h.Login)
 	e.POST("/logout", h.Logout)
+	e.GET("/me", h.Me)
 
 	e.GET("/contests/:contestID", h.GetContest)
 

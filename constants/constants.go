@@ -1,3 +1,4 @@
 package constants
 
-const AtCoderHost string = "atcoder.jp"
+const Version = "v0.0.1"
+const AtCoderHost = "atcoder.jp"
