@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"net/http"
 
@@ -12,17 +13,21 @@ import (
 func (h *Handler) Login(c echo.Context) (err error) {
 	fmt.Println("h.Login")
 
-	u := new(models.User)
-	if err = c.Bind(u); err != nil {
+	user := new(models.User)
+	if err = c.Bind(user); err != nil {
 		return err
 	}
 
-	// TODO: validate user
-
-	if err := startPage(h, u.ID); err != nil {
-		return err
+	if user.ID == "" || user.Password == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid user id or password.")
 	}
-	page, err := getPage(h, u.ID)
+
+	if isLoggedIn(h, user.ID) {
+		// when the user has already logged in, do not return token
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("user %s has aready logged in.", user.ID))
+	}
+
+	page, err := startPage(h, user.ID)
 	if err != nil {
 		return err
 	}
@@ -32,18 +37,64 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	}
 	fmt.Println(pageObj.GetPage().Title())
 
-	// TODO: login
+	// TODO: access page
+	// send user id and password
 
-	u.Password = "" // Don't send password
-	return c.JSON(http.StatusOK, u)
+	// Generate encoded token and send it as response
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = user.ID
+	user.Token, err = token.SignedString([]byte(h.jwtSecret))
+	if err != nil {
+		return err
+	}
+
+	user.Password = "" // Don't send password
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *Handler) Logout(c echo.Context) (err error) {
 	fmt.Println("h.Logout")
 
-	// TODO: logout
-	// TODO: stop page
+	userID := userIDFromToken(c)
 
-	u := new(models.User)
-	return c.JSON(http.StatusOK, u)
+	if err = stopPage(h, userID); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, models.User{ID: userID})
+}
+
+func userIDFromToken(c echo.Context) string {
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["id"].(string)
+}
+
+func isLoggedIn(h *Handler, userID string) bool {
+	_, err := getPage(h, userID)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// TODO: access page
+	// check if the user logged in to AtCoder
+
+	return true
+}
+
+func currentUser(h *Handler, c echo.Context) (*models.User, error) {
+	user := new(models.User)
+	user.ID = userIDFromToken(c)
+	loggedIn := isLoggedIn(h, user.ID)
+	if !loggedIn {
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
+	}
+
+	// TODO: access page
+	// get user name
+	user.Name = "myname"
+
+	return user, nil
 }

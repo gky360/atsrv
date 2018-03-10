@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/sclevine/agouti"
 	"path/filepath"
 	"runtime"
@@ -25,7 +26,21 @@ func main() {
 	}
 	defer driver.Stop()
 
-	h := handlers.NewHandler(exPath, driver)
+	jwtSecret := []byte("hogehoge")
+	h := handlers.NewHandler(exPath, driver, jwtSecret)
+
+	// Middlewares
+	e.Use(middleware.Logger())
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte(jwtSecret),
+		Skipper: func(c echo.Context) bool {
+			if c.Path() == "/" || c.Path() == "/login" {
+				// Skip authentication for root and login requests
+				return true
+			}
+			return false
+		},
+	}))
 
 	// Routes
 	e.GET("/", h.Root)
