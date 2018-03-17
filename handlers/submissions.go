@@ -25,12 +25,12 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskID, err := paramContestTaskID(c)
+	contestID, taskName, err := paramContestTask(c)
 	if err != nil {
 		return err
 	}
 	fmt.Println(contestID)
-	fmt.Println(taskID)
+	fmt.Println(taskName)
 
 	// TODO: access page
 	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
@@ -54,12 +54,12 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskID, submissionID, err := paramContestTaskSubmissionID(c)
+	contestID, taskName, submissionID, err := paramContestTaskSubmission(c)
 	if err != nil {
 		return err
 	}
 	fmt.Println(contestID)
-	fmt.Println(taskID)
+	fmt.Println(taskName)
 	fmt.Println(submissionID)
 
 	// TODO: access page
@@ -84,12 +84,12 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskID, err := paramContestTaskID(c)
+	contestID, taskName, err := paramContestTask(c)
 	if err != nil {
 		return err
 	}
 	fmt.Println(contestID)
-	fmt.Println(taskID)
+	fmt.Println(taskName)
 	sbm := new(models.Submission)
 	if err = c.Bind(sbm); err != nil {
 		return err
@@ -103,11 +103,11 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, sbm)
 }
 
-func paramContestTaskSubmissionID(c echo.Context) (
-	contestID, taskID, SubmissionID string,
+func paramContestTaskSubmission(c echo.Context) (
+	contestID, taskName, SubmissionID string,
 	err error,
 ) {
-	contestID, taskID, err = paramContestTaskID(c)
+	contestID, taskName, err = paramContestTask(c)
 	if err != nil {
 		return
 	}

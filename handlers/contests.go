@@ -19,7 +19,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, err := paramContestID(c)
+	contestID, err := paramContest(c)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, contest)
 }
 
-func paramContestID(c echo.Context) (string, error) {
+func paramContest(c echo.Context) (string, error) {
 	contestID := c.Param("contestID")
 	if len(contestID) == 0 {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "contest id should not be empty.")
