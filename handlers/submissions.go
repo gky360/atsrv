@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gky360/atsrv/models"
+	"github.com/labstack/echo"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type (
@@ -25,7 +26,7 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskName, err := paramContestTask(c)
+	contestID, taskName, err := paramContestTaskQ(c)
 	if err != nil {
 		return err
 	}
@@ -54,12 +55,11 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskName, submissionID, err := paramContestTaskSubmission(c)
+	contestID, submissionID, err := paramContestSubmission(c)
 	if err != nil {
 		return err
 	}
 	fmt.Println(contestID)
-	fmt.Println(taskName)
 	fmt.Println(submissionID)
 
 	// TODO: access page
@@ -84,9 +84,12 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskName, err := paramContestTask(c)
+	contestID, taskName, err := paramContestTaskQ(c)
 	if err != nil {
 		return err
+	}
+	if taskName == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
 	fmt.Println(contestID)
 	fmt.Println(taskName)
@@ -94,7 +97,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	if err = c.Bind(sbm); err != nil {
 		return err
 	}
-	if len(sbm.Source) == 0 {
+	if sbm.Source == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "source should not be empty.")
 	}
 
@@ -103,18 +106,25 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, sbm)
 }
 
-func paramContestTaskSubmission(c echo.Context) (
-	contestID, taskName, SubmissionID string,
-	err error,
-) {
-	contestID, taskName, err = paramContestTask(c)
+func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {
+	contestID, err = paramContest(c)
 	if err != nil {
 		return
 	}
 
-	submissionID := c.Param("submissionID")
-	if len(submissionID) == 0 {
-		err = echo.NewHTTPError(http.StatusBadRequest, "submission id should not be empty.")
+	taskName = c.QueryParam("task_name")
+	return
+}
+
+func paramContestSubmission(c echo.Context) (contestID string, submissionID int, err error) {
+	contestID, err = paramContest(c)
+	if err != nil {
+		return
+	}
+
+	submissionID, err = strconv.Atoi(c.Param("submissionID"))
+	if err != nil {
+		err = echo.NewHTTPError(http.StatusBadRequest, "submission id is invalid.")
 	}
 	return
 }

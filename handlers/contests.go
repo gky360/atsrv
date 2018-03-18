@@ -41,7 +41,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 
 func paramContest(c echo.Context) (string, error) {
 	contestID := c.Param("contestID")
-	if len(contestID) == 0 {
+	if contestID == "" {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "contest id should not be empty.")
 	}
 	return contestID, nil

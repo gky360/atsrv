@@ -81,8 +81,8 @@ func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
 	}
 
 	taskName = c.Param("taskName")
-	if len(taskName) == 0 {
-		err = echo.NewHTTPError(http.StatusBadRequest, "task id should not be empty.")
+	if taskName == "" {
+		err = echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
 	return
 }
