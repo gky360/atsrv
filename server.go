@@ -52,6 +52,7 @@ func main() {
 	e.GET("/me", h.Me)
 
 	e.GET("/contests/:contestID", h.GetContest)
+	e.POST("/contests/:contestID/join", h.Join)
 
 	e.GET("/contests/:contestID/tasks", h.GetTasks)
 	e.GET("/contests/:contestID/tasks/:taskName", h.GetTask)

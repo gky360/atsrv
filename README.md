@@ -11,6 +11,7 @@ Backend for atcli ( https://github.com/gky360/atcli )
 | POST | y | n | /logout |
 | GET  | y | y | /me |
 | GET  | y | y | /contests/arc090 |
+| POST | y | y | /contests/arc090/join |
 | GET  | y | y | /contests/arc090/tasks |
 | GET  | y | y | /contests/arc090/tasks/d |
 | GET  | y | y | /contests/arc090/submissions |
