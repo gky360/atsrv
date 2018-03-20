@@ -6,11 +6,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Sample struct {
+	Num    int    `json:"num" yaml:"num"`
+	Input  string `json:"input" yaml:"input"`
+	Output string `json:"output" yaml:"output"`
+}
+
 type Task struct {
-	ID    string `json:"id" yaml:"id"`
-	Name  string `json:"name" yaml:"name"`
-	Title string `json:"title" yaml:"title"`
-	Score int    `json:"score" yaml:"score"`
+	ID      string   `json:"id" yaml:"id"`
+	Name    string   `json:"name" yaml:"name"`
+	Title   string   `json:"title" yaml:"title"`
+	Score   int      `json:"score" yaml:"score"`
+	Samples []Sample `json:"samples" yaml:"samples,omitempty"`
 }
 
 func (task *Task) ToYaml() (string, error) {
@@ -22,6 +29,12 @@ func (task *Task) ToYaml() (string, error) {
 	return fmt.Sprintf("---\n%s", string(d)), nil
 }
 
+func (_task *Task) ToYamlShort() (string, error) {
+	task := _task
+	task.Samples = nil
+	return task.ToYaml()
+}
+
 func TasksToYaml(tasks []Task) (string, error) {
 	d, err := yaml.Marshal(&tasks)
 	if err != nil {
@@ -29,4 +42,12 @@ func TasksToYaml(tasks []Task) (string, error) {
 	}
 
 	return fmt.Sprintf("---\n%s", string(d)), nil
+}
+
+func TasksToYamlShort(_tasks []Task) (string, error) {
+	tasks := _tasks
+	for i := range tasks {
+		tasks[i].Samples = nil
+	}
+	return TasksToYaml(tasks)
 }
