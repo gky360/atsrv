@@ -52,13 +52,14 @@ func main() {
 	e.GET("/me", h.Me)
 
 	e.GET("/contests/:contestID", h.GetContest)
+	e.POST("/contests/:contestID/join", h.Join)
 
 	e.GET("/contests/:contestID/tasks", h.GetTasks)
-	e.GET("/contests/:contestID/tasks/:taskID", h.GetTask)
+	e.GET("/contests/:contestID/tasks/:taskName", h.GetTask)
 
-	e.GET("/contests/:contestID/tasks/:taskID/submissions", h.GetSubmissions)
-	e.GET("/contests/:contestID/tasks/:taskID/submissions/:submissionID", h.GetSubmission)
-	e.POST("/contests/:contestID/tasks/:taskID/submissions", h.PostSubmission)
+	e.GET("/contests/:contestID/submissions", h.GetSubmissions)
+	e.GET("/contests/:contestID/submissions/:submissionID", h.GetSubmission)
+	e.POST("/contests/:contestID/submissions", h.PostSubmission)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

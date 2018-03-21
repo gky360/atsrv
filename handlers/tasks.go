@@ -25,7 +25,7 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, err := paramContestID(c)
+	contestID, err := paramContest(c)
 	if err != nil {
 		return err
 	}
@@ -53,12 +53,12 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskID, err := paramContestTaskID(c)
+	contestID, taskName, err := paramContestTask(c)
 	if err != nil {
 		return err
 	}
 	fmt.Println(contestID)
-	fmt.Println(taskID)
+	fmt.Println(taskName)
 
 	// TODO: access page
 	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
@@ -74,15 +74,15 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, rsp.Tasks[0])
 }
 
-func paramContestTaskID(c echo.Context) (contestID, taskID string, err error) {
-	contestID, err = paramContestID(c)
+func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
+	contestID, err = paramContest(c)
 	if err != nil {
 		return
 	}
 
-	taskID = c.Param("taskID")
-	if len(taskID) == 0 {
-		err = echo.NewHTTPError(http.StatusBadRequest, "task id should not be empty.")
+	taskName = c.Param("taskName")
+	if taskName == "" {
+		err = echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
 	return
 }

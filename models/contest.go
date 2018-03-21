@@ -1,7 +1,10 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/gky360/atsrv/constants"
+	"gopkg.in/yaml.v2"
 )
 
 type Contest struct {
@@ -15,6 +18,15 @@ func (c *Contest) Host() string {
 
 func (c *Contest) URL() string {
 	return "https://" + c.Host()
+}
+
+func (c *Contest) ToYaml() (string, error) {
+	d, err := yaml.Marshal(&c)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("---\n%s", string(d)), nil
 }
 
 func GetCurrentContest() (Contest, error) {

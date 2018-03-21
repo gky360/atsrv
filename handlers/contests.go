@@ -19,7 +19,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, err := paramContestID(c)
+	contestID, err := paramContest(c)
 	if err != nil {
 		return err
 	}
@@ -39,9 +39,37 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, contest)
 }
 
-func paramContestID(c echo.Context) (string, error) {
+func (h *Handler) Join(c echo.Context) (err error) {
+	fmt.Println("h.Join")
+	user, err := currentUser(h, c)
+	if err != nil {
+		return err
+	}
+	c.Logger().Info(user.ID)
+
+	contestID, err := paramContest(c)
+	if err != nil {
+		return err
+	}
+	fmt.Println(contestID)
+
+	// TODO: access page
+	testFilePath := filepath.Join(h.pkgPath, "testdata", "contest.yaml")
+	buf, err := ioutil.ReadFile(testFilePath)
+	if err != nil {
+		panic(err)
+	}
+	contest := new(models.Contest)
+	if err = yaml.Unmarshal(buf, &contest); err != nil {
+		panic(err)
+	}
+
+	return c.JSON(http.StatusOK, contest)
+}
+
+func paramContest(c echo.Context) (string, error) {
 	contestID := c.Param("contestID")
-	if len(contestID) == 0 {
+	if contestID == "" {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "contest id should not be empty.")
 	}
 	return contestID, nil
