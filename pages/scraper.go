@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/gky360/atsrv/constants"
@@ -18,23 +19,39 @@ type Scraper interface {
 }
 
 func ContestHost(contestID string) string {
-	return "https://" + contestID + ".contest." + constants.AtCoderHost
+	return contestID + ".contest." + constants.AtCoderHost
 }
 
 func TargetURL(s Scraper) string {
-	return filepath.Join(s.TargetHost(), s.TargetPath())
+	return "https://" + filepath.Join(s.TargetHost(), s.TargetPath())
 }
 
-func At(s Scraper) error {
-	page := s.Page()
-	currentURL, err := page.URL()
+func At(s Scraper) (bool, error) {
+	currentURL, err := s.Page().URL()
+	if err != nil {
+		return false, err
+	}
+	targetURL := TargetURL(s)
+	return (currentURL == targetURL), nil
+}
+
+func To(s Scraper) error {
+	isAt, err := At(s)
 	if err != nil {
 		return err
 	}
-	targetURL := TargetURL(s)
-	if currentURL != targetURL {
-		if err := page.Navigate(targetURL); err != nil {
+	if !isAt {
+		targetURL := TargetURL(s)
+		fmt.Println(targetURL)
+		if err := s.Page().Navigate(targetURL); err != nil {
 			return err
+		}
+		isAt, err := At(s)
+		if err != nil {
+			return err
+		}
+		if !isAt {
+			return fmt.Errorf("Couldn't navigate to %s", targetURL)
 		}
 	}
 	return nil

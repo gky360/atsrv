@@ -29,12 +29,8 @@ func NewTasksPage(page *agouti.Page, contestID string) (*TasksPage, error) {
 		contestID: contestID,
 		navbar:    modules.NewNavbarModule(page),
 	}
-	if err := At(p); err != nil {
+	if err := To(p); err != nil {
 		return nil, err
 	}
 	return p, nil
-}
-
-func (p *TasksPage) Login(userID, password string) error {
-	return p.navbar.Login(userID, password)
 }

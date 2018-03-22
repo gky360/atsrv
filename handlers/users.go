@@ -31,15 +31,17 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	pageObj, err := pages.NewTasksPage(page, pages.PracticeContestID)
+	loginPage, err := pages.NewLoginPage(page)
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
 	}
-	fmt.Println(pageObj.Page().Title())
+	fmt.Println(loginPage.Page().Title())
 
-	// TODO: access page
-	// send user id and password
+	// Send user id and password
+	if err := loginPage.Login(user.ID, user.Password); err != nil {
+		return err
+	}
 
 	// Generate encoded token and send it as response
 	token := jwt.New(jwt.SigningMethodHS256)
