@@ -31,12 +31,12 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	pageObj, err := pages.NewTasksPage(page)
+	pageObj, err := pages.NewTasksPage(page, pages.PracticeContestID)
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
 	}
-	fmt.Println(pageObj.GetPage().Title())
+	fmt.Println(pageObj.Page().Title())
 
 	// TODO: access page
 	// send user id and password
