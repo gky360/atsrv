@@ -45,12 +45,12 @@ func (p *TaskPage) titleH2() *agouti.Selection {
 
 func (p *TaskPage) statement() *agouti.Selection {
 	const selector = "#main-container #task-statement"
-	const JaSelector = selector + " .lang .lang-ja"
+	const JaSelector = selector + " > .lang .lang-ja"
 	sel := p.page.Find(JaSelector)
 	if _, err := sel.Count(); err != nil {
 		// element not found
 		// this is for old contests
-		sel = p.page.Find(selector)
+		sel = p.page.All(selector).At(0)
 	}
 	return sel
 }
@@ -83,6 +83,9 @@ func (p *TaskPage) taskNameAndTitle() (string, string, error) {
 
 func (p *TaskPage) taskScore() (int, error) {
 	scoreRaw, err := p.scoreSpan().Text()
+	if err != nil {
+		return 0, nil
+	}
 	rep := regexp.MustCompile("[0-9]+")
 	if err != nil {
 		return 0, err
@@ -110,7 +113,10 @@ func (p *TaskPage) sample(num int) (*models.Sample, error) {
 
 func (p *TaskPage) samples() ([]*models.Sample, error) {
 	presCnt, err := p.samplePres().Count()
-	fmt.Println(presCnt)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("found %d samples\n", presCnt/2)
 	samples := make([]*models.Sample, presCnt/2)
 	for i := range samples {
 		samples[i], err = p.sample(i + 1)
