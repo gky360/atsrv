@@ -1,6 +1,8 @@
 package pages
 
 import (
+	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -54,8 +56,18 @@ func (p *TaskPage) statement() *agouti.Selection {
 }
 
 func (p *TaskPage) scoreSpan() *agouti.Selection {
-	const xpath = "//p[contains(text(), '配点')]/var"
+	const xpath = ".//p[contains(text(), '配点')]/var"
 	return p.statement().FindByXPath(xpath)
+}
+
+func (p *TaskPage) samplePres() *agouti.MultiSelection {
+	const xpath = ".//*[contains(@class, 'part')]//section//pre[contains(@id, 'pre-sample')]"
+	return p.statement().AllByXPath(xpath)
+}
+
+func (p *TaskPage) samplePre(index int) *agouti.Selection {
+	selector := fmt.Sprintf(".part section pre#pre-sample%d", index)
+	return p.statement().Find(selector)
 }
 
 // Values
@@ -71,10 +83,43 @@ func (p *TaskPage) taskNameAndTitle() (string, string, error) {
 
 func (p *TaskPage) taskScore() (int, error) {
 	scoreRaw, err := p.scoreSpan().Text()
+	rep := regexp.MustCompile("[0-9]+")
 	if err != nil {
 		return 0, err
 	}
-	return strconv.Atoi(scoreRaw)
+	score, _ := strconv.Atoi(rep.FindString(scoreRaw))
+	return score, nil
+}
+
+func (p *TaskPage) sample(num int) (*models.Sample, error) {
+	inputStr, err := p.samplePre(num*2 - 2).Text()
+	if err != nil {
+		return nil, err
+	}
+	outputStr, err := p.samplePre(num*2 - 1).Text()
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Sample{
+		Num:    num,
+		Input:  inputStr,
+		Output: outputStr,
+	}, nil
+}
+
+func (p *TaskPage) samples() ([]*models.Sample, error) {
+	presCnt, err := p.samplePres().Count()
+	fmt.Println(presCnt)
+	samples := make([]*models.Sample, presCnt/2)
+	for i := range samples {
+		samples[i], err = p.sample(i + 1)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return samples, nil
 }
 
 // Funcs
@@ -88,10 +133,15 @@ func (p *TaskPage) GetTask() (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
+	samples, err := p.samples()
+	if err != nil {
+		fmt.Println(err)
+	}
 	return &models.Task{
-		ID:    p.taskID,
-		Name:  taskName,
-		Title: taskTitle,
-		Score: taskScore,
+		ID:      p.taskID,
+		Name:    taskName,
+		Title:   taskTitle,
+		Score:   taskScore,
+		Samples: samples,
 	}, nil
 }

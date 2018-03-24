@@ -13,11 +13,11 @@ type Sample struct {
 }
 
 type Task struct {
-	ID      string   `json:"id" yaml:"id"`
-	Name    string   `json:"name" yaml:"name"`
-	Title   string   `json:"title" yaml:"title"`
-	Score   int      `json:"score,omitempty" yaml:"score,omitempty"`
-	Samples []Sample `json:"samples,omitempty" yaml:"samples,omitempty"`
+	ID      string    `json:"id" yaml:"id"`
+	Name    string    `json:"name" yaml:"name"`
+	Title   string    `json:"title" yaml:"title"`
+	Score   int       `json:"score,omitempty" yaml:"score,omitempty"`
+	Samples []*Sample `json:"samples,omitempty" yaml:"samples,omitempty"`
 }
 
 func (task *Task) ToYaml() (string, error) {
