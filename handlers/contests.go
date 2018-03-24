@@ -2,14 +2,10 @@ package handlers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 
-	"github.com/gky360/atsrv/models"
 	"github.com/gky360/atsrv/pages"
 	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
 )
 
 func (h *Handler) GetContest(c echo.Context) (err error) {
@@ -49,17 +45,25 @@ func (h *Handler) Join(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "contest.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	contestPage, err := getContestPage(h, user.ID, contestID)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	contest := new(models.Contest)
-	if err = yaml.Unmarshal(buf, &contest); err != nil {
-		panic(err)
+	isJoined, err := contestPage.IsJoined()
+	if err != nil {
+		return err
+	}
+	if isJoined {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("already joined contest %s", contestID))
+	}
+
+	if err = contestPage.Join(); err != nil {
+		return err
+	}
+	contest, err := contestPage.GetContest()
+	if err != nil {
+		return err
 	}
 
 	return c.JSON(http.StatusOK, contest)

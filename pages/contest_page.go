@@ -45,6 +45,11 @@ func (p *ContestPage) Navbar() *modules.NavbarModule {
 	return p.navbar
 }
 
+func (p *ContestPage) joinBtn() *agouti.Selection {
+	const selector = ".insert-participant-box button"
+	return p.page.Find(selector)
+}
+
 // Values
 
 func (p *ContestPage) contestName() (string, error) {
@@ -67,4 +72,38 @@ func (p *ContestPage) GetContest() (*models.Contest, error) {
 		ID:   p.contestID,
 		Name: contestName,
 	}, nil
+}
+
+func (p *ContestPage) IsJoined() (bool, error) {
+	cnt, _ := p.joinBtn().Count()
+	if cnt >= 2 {
+		return false, fmt.Errorf("found multiple join buttons")
+	} else if cnt == 1 {
+		// not joined
+		return false, nil
+	}
+	// joined
+	return true, nil
+}
+
+func (p *ContestPage) Join() error {
+	isJoined, err := p.IsJoined()
+	if err != nil {
+		return err
+	}
+	if isJoined {
+		return nil
+	}
+
+	if err := p.joinBtn().Click(); err != nil {
+		return err
+	}
+	isJoined, err = p.IsJoined()
+	if err != nil {
+		return err
+	}
+	if !isJoined {
+		return fmt.Errorf("failed to join contest %s", p.contestID)
+	}
+	return nil
 }
