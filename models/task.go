@@ -35,7 +35,7 @@ func (_task *Task) ToYamlShort() (string, error) {
 	return task.ToYaml()
 }
 
-func TasksToYaml(tasks []Task) (string, error) {
+func TasksToYaml(tasks []*Task) (string, error) {
 	d, err := yaml.Marshal(&tasks)
 	if err != nil {
 		return "", err
@@ -44,9 +44,10 @@ func TasksToYaml(tasks []Task) (string, error) {
 	return fmt.Sprintf("---\n%s", string(d)), nil
 }
 
-func TasksToYamlShort(_tasks []Task) (string, error) {
-	tasks := _tasks
+func TasksToYamlShort(_tasks []*Task) (string, error) {
+	tasks := make([]*Task, len(_tasks))
 	for i := range tasks {
+		*tasks[i] = *_tasks[i]
 		tasks[i].Samples = nil
 	}
 	return TasksToYaml(tasks)
