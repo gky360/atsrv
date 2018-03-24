@@ -36,11 +36,13 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		stopPage(h, user.ID)
 		return err
 	}
-	fmt.Println(loginPage.Page().Title())
 
 	// Send user id and password
 	if err := loginPage.Login(user.ID, user.Password); err != nil {
 		return err
+	}
+	if !isLoggedIn(h, user.ID) {
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", user.ID))
 	}
 
 	// Generate encoded token and send it as response
@@ -48,6 +50,18 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = user.ID
 	user.Token, err = token.SignedString([]byte(h.jwtSecret))
+	if err != nil {
+		stopPage(h, user.ID)
+		return err
+	}
+
+	// Get user name
+	contestPage, err := pages.NewContestPage(page, pages.PracticeContestID)
+	if err != nil {
+		stopPage(h, user.ID)
+		return err
+	}
+	user.Name, err = contestPage.Navbar().GetUserName()
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
@@ -86,17 +100,30 @@ func userIDFromToken(c echo.Context) string {
 	return claims["id"].(string)
 }
 
+func getContestPage(h *Handler, userID string) (*pages.ContestPage, error) {
+	page, err := getPage(h, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return pages.NewContestPage(page, pages.PracticeContestID)
+}
+
 func isLoggedIn(h *Handler, userID string) bool {
-	_, err := getPage(h, userID)
+	contestPage, err := getContestPage(h, userID)
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
-	// TODO: access page
-	// check if the user logged in to AtCoder
+	// Check if the user logged in to AtCoder
+	ret, err := contestPage.Navbar().IsLoggedIn()
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 
-	return true
+	return ret
 }
 
 func currentUser(h *Handler, c echo.Context) (*models.User, error) {
@@ -107,9 +134,16 @@ func currentUser(h *Handler, c echo.Context) (*models.User, error) {
 		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
 	}
 
-	// TODO: access page
-	// get user name
-	user.Name = "myname"
+	// Get user name
+	contestPage, err := getContestPage(h, user.ID)
+	if err != nil {
+		return nil, err
+	}
+	userName, err := contestPage.Navbar().GetUserName()
+	if err != nil {
+		return nil, err
+	}
+	user.Name = userName
 
 	return user, nil
 }

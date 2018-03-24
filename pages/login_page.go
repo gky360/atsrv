@@ -34,26 +34,26 @@ func NewLoginPage(page *agouti.Page) (*LoginPage, error) {
 
 // Elements
 
-func (p *LoginPage) UserIDForm() *agouti.Selection {
-	return p.page.First("input[name=name]")
+func (p *LoginPage) userIDForm() *agouti.Selection {
+	return p.page.Find("input[name=name]")
 }
 
-func (p *LoginPage) PasswordForm() *agouti.Selection {
-	return p.page.First("input[name=password]")
+func (p *LoginPage) passwordForm() *agouti.Selection {
+	return p.page.Find("input[name=password]")
 }
 
 // Values
 
-// Operations
+// Funcs
 
 func (p *LoginPage) Login(userID, password string) error {
-	if err := p.UserIDForm().Fill(userID); err != nil {
+	if err := p.userIDForm().Fill(userID); err != nil {
 		return err
 	}
-	if err := p.PasswordForm().Fill(password); err != nil {
+	if err := p.passwordForm().Fill(password); err != nil {
 		return err
 	}
-	if err := p.UserIDForm().Submit(); err != nil {
+	if err := p.userIDForm().Submit(); err != nil {
 		return err
 	}
 	return nil
