@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/gky360/atsrv/models"
@@ -46,26 +47,32 @@ func (p *TasksPage) taskTRs() *agouti.MultiSelection {
 
 // Values
 
-func (p *TasksPage) tasks() ([]models.Task, error) {
+func (p *TasksPage) tasks() ([]*models.Task, error) {
 	tasksTRs := p.taskTRs()
 	cnt, _ := tasksTRs.Count()
-	tasks := make([]models.Task, cnt)
-	for i := 0; i < cnt; i++ {
+	tasks := make([]*models.Task, cnt)
+	for i := range tasks {
 		taskCols := tasksTRs.At(i).All("td")
 		if colsCnt, _ := taskCols.Count(); colsCnt != 5 {
 			return nil, fmt.Errorf("found invalid element")
 		}
+		taskIDHref, err := taskCols.At(0).Find("a").Attribute("href")
+		if err != nil {
+			return nil, err
+		}
 		taskNameRaw, _ := taskCols.At(0).Text()
 		taskTitleRaw, _ := taskCols.At(1).Text()
-		tasks[i].ID = "hoge"
-		tasks[i].Name = strings.TrimSpace(taskNameRaw)
-		tasks[i].Title = strings.TrimSpace(taskTitleRaw)
+		tasks[i] = &models.Task{
+			ID:    path.Base(taskIDHref),
+			Name:  strings.TrimSpace(taskNameRaw),
+			Title: strings.TrimSpace(taskTitleRaw),
+		}
 	}
 	return tasks, nil
 }
 
 // Funcs
 
-func (p *TasksPage) GetTasks() ([]models.Task, error) {
+func (p *TasksPage) GetTasks() ([]*models.Task, error) {
 	return p.tasks()
 }

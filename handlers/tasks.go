@@ -9,12 +9,13 @@ import (
 	"github.com/gky360/atsrv/models"
 	"github.com/gky360/atsrv/pages"
 	"github.com/labstack/echo"
+	"github.com/sclevine/agouti"
 	yaml "gopkg.in/yaml.v2"
 )
 
 type (
 	RspGetTasks struct {
-		Tasks []models.Task `json:"tasks" yaml:"tasks"`
+		Tasks []*models.Task `json:"tasks" yaml:"tasks"`
 	}
 )
 
@@ -43,7 +44,7 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 		return err
 	}
 	if isFull {
-		if err := getTasksFull(h, c, tasks); err != nil {
+		if err := getTasksFull(page, contestID, tasks); err != nil {
 			return err
 		}
 	}
@@ -96,6 +97,16 @@ func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
 	return
 }
 
-func getTasksFull(h *Handler, c echo.Context, tasks []models.Task) error {
+func getTasksFull(page *agouti.Page, contestID string, tasks []*models.Task) error {
+	for i := range tasks {
+		taskPage, err := pages.NewTaskPage(page, contestID, tasks[i].ID)
+		if err != nil {
+			return err
+		}
+		tasks[i], err = taskPage.GetTask()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

@@ -37,7 +37,7 @@ func To(s Scraper) error {
 	}
 	if !isAt {
 		targetURL := TargetURL(s)
-		fmt.Println(targetURL)
+		fmt.Println("To:", targetURL)
 		if err := s.Page().Navigate(targetURL); err != nil {
 			return err
 		}
