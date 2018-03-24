@@ -22,7 +22,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid user id or password.")
 	}
 
-	if isLoggedIn(h, user.ID) {
+	if isLoggedIn(h, user.ID, pages.PracticeContestID) {
 		// when the user has already logged in, do not return token
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("user %s has aready logged in.", user.ID))
 	}
@@ -41,7 +41,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	if err := loginPage.Login(user.ID, user.Password); err != nil {
 		return err
 	}
-	if !isLoggedIn(h, user.ID) {
+	if !isLoggedIn(h, user.ID, pages.PracticeContestID) {
 		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", user.ID))
 	}
 
@@ -85,7 +85,7 @@ func (h *Handler) Logout(c echo.Context) (err error) {
 
 func (h *Handler) Me(c echo.Context) (err error) {
 	fmt.Println("h.Me")
-	user, err := currentUser(h, c)
+	user, err := currentUserWithContestID(h, c, pages.PracticeContestID)
 	if err != nil {
 		return err
 	}
@@ -100,17 +100,8 @@ func userIDFromToken(c echo.Context) string {
 	return claims["id"].(string)
 }
 
-func getContestPage(h *Handler, userID string) (*pages.ContestPage, error) {
-	page, err := getPage(h, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return pages.NewContestPage(page, pages.PracticeContestID)
-}
-
-func isLoggedIn(h *Handler, userID string) bool {
-	contestPage, err := getContestPage(h, userID)
+func isLoggedIn(h *Handler, userID string, contestID string) bool {
+	contestPage, err := getContestPage(h, userID, contestID)
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -126,16 +117,16 @@ func isLoggedIn(h *Handler, userID string) bool {
 	return ret
 }
 
-func currentUser(h *Handler, c echo.Context) (*models.User, error) {
+func currentUserWithContestID(h *Handler, c echo.Context, contestID string) (*models.User, error) {
 	user := new(models.User)
 	user.ID = userIDFromToken(c)
-	loggedIn := isLoggedIn(h, user.ID)
+	loggedIn := isLoggedIn(h, user.ID, contestID)
 	if !loggedIn {
 		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
 	}
 
 	// Get user name
-	contestPage, err := getContestPage(h, user.ID)
+	contestPage, err := getContestPage(h, user.ID, contestID)
 	if err != nil {
 		return nil, err
 	}
@@ -146,4 +137,12 @@ func currentUser(h *Handler, c echo.Context) (*models.User, error) {
 	user.Name = userName
 
 	return user, nil
+}
+
+func currentUser(h *Handler, c echo.Context) (*models.User, error) {
+	contestID, err := paramContest(c)
+	if err != nil {
+		return nil, err
+	}
+	return currentUserWithContestID(h, c, contestID)
 }

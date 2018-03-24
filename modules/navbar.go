@@ -2,6 +2,7 @@ package modules
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/sclevine/agouti"
 )
@@ -35,7 +36,7 @@ func (m *NavbarModule) userName() (string, error) {
 		return "", err
 	}
 	rep := regexp.MustCompile(`^(.*)\((?:contestant|guest)\)$`)
-	return rep.ReplaceAllString(userNameRaw, "$1"), nil
+	return rep.ReplaceAllString(strings.TrimSpace(userNameRaw), "$1"), nil
 }
 
 // Funcs
