@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gky360/atsrv/models"
+	"github.com/gky360/atsrv/pages"
+	"github.com/labstack/echo"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type (
@@ -29,18 +30,26 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
+	isFull := (c.QueryParam("full") == "true")
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
+	tasksPage, err := pages.NewTasksPage(page, contestID)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	tasks, err := tasksPage.GetTasks()
+	if err != nil {
+		return err
+	}
+	if isFull {
+		if err := getTasksFull(h, c, tasks); err != nil {
+			return err
+		}
+	}
+
 	rsp := new(RspGetTasks)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
-	}
+	rsp.Tasks = tasks
 
 	return c.JSON(http.StatusOK, rsp)
 }
@@ -85,4 +94,8 @@ func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
 		err = echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
 	return
+}
+
+func getTasksFull(h *Handler, c echo.Context, tasks []models.Task) error {
+	return nil
 }
