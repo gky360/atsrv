@@ -5,16 +5,11 @@ import (
 )
 
 type LoginPage struct {
-	page      *agouti.Page
-	contestID string
+	page *agouti.Page
 }
 
 func (p *LoginPage) Page() *agouti.Page {
 	return p.page
-}
-
-func (p *LoginPage) TargetHost() string {
-	return ContestHost(p.contestID)
 }
 
 func (p *LoginPage) TargetPath() string {
@@ -23,8 +18,7 @@ func (p *LoginPage) TargetPath() string {
 
 func NewLoginPage(page *agouti.Page) (*LoginPage, error) {
 	p := &LoginPage{
-		page:      page,
-		contestID: PracticeContestID,
+		page: page,
 	}
 	if err := To(p); err != nil {
 		return nil, err
@@ -35,11 +29,13 @@ func NewLoginPage(page *agouti.Page) (*LoginPage, error) {
 // Elements
 
 func (p *LoginPage) userIDForm() *agouti.Selection {
-	return p.page.Find("input[name=name]")
+	const selector = "input#username"
+	return p.page.Find(selector)
 }
 
 func (p *LoginPage) passwordForm() *agouti.Selection {
-	return p.page.Find("input[name=password]")
+	const selector = "input#password"
+	return p.page.Find(selector)
 }
 
 // Values

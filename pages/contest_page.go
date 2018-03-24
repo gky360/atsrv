@@ -19,12 +19,8 @@ func (p *ContestPage) Page() *agouti.Page {
 	return p.page
 }
 
-func (p *ContestPage) TargetHost() string {
-	return ContestHost(p.contestID)
-}
-
 func (p *ContestPage) TargetPath() string {
-	return "/#"
+	return "/contests/" + p.contestID
 }
 
 func NewContestPage(page *agouti.Page, contestID string) (*ContestPage, error) {

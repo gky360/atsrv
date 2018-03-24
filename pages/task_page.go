@@ -1,10 +1,10 @@
 package pages
 
 import (
-	"fmt"
-	"strings"
+	// "fmt"
+	// "strings"
 
-	"github.com/gky360/atsrv/models"
+	// "github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
 )
 
@@ -18,12 +18,8 @@ func (p *TaskPage) Page() *agouti.Page {
 	return p.page
 }
 
-func (p *TaskPage) TargetHost() string {
-	return ContestHost(p.contestID)
-}
-
 func (p *TaskPage) TargetPath() string {
-	return "/tasks/" + p.taskID
+	return "/contests/" + p.contestID + "/tasks/" + p.taskID
 }
 
 func NewTaskPage(page *agouti.Page, contestID string, taskID string) (*TaskPage, error) {
@@ -41,13 +37,20 @@ func NewTaskPage(page *agouti.Page, contestID string, taskID string) (*TaskPage,
 // Elements
 
 func (p *TaskPage) titleH2() *agouti.Selection {
-	const selector = "#outer-inner h2"
+	const selector = "#main-container .h2"
 	return p.page.Find(selector)
 }
 
 func (p *TaskPage) statement() *agouti.Selection {
-	const selector = "#outer-inner > #task-statement > .lang > .lang-en"
-	return p.page.Find(selector)
+	const selector = "#main-container #task-statement"
+	const JaSelector = selector + ".lang .lang-ja"
+	sel := p.page.Find(JaSelector)
+	if _, err := sel.Count(); err != nil {
+		// element not found
+		// this is for old contests
+		sel = p.page.Find(selector)
+	}
+	return sel
 }
 
 // Values

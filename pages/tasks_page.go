@@ -17,12 +17,8 @@ func (p *TasksPage) Page() *agouti.Page {
 	return p.page
 }
 
-func (p *TasksPage) TargetHost() string {
-	return ContestHost(p.contestID)
-}
-
 func (p *TasksPage) TargetPath() string {
-	return "/assignments"
+	return "/contests/" + p.contestID + "/tasks"
 }
 
 func NewTasksPage(page *agouti.Page, contestID string) (*TasksPage, error) {
@@ -39,7 +35,7 @@ func NewTasksPage(page *agouti.Page, contestID string) (*TasksPage, error) {
 // Elements
 
 func (p *TasksPage) tasksTable() *agouti.Selection {
-	const selector = "#outer-inner .table"
+	const selector = "#main-container .table"
 	return p.page.Find(selector)
 }
 

@@ -18,31 +18,35 @@ func NewNavbarModule(page *agouti.Page) *NavbarModule {
 // Elements
 
 func (m *NavbarModule) self() *agouti.Selection {
-	const navbarSelector = "div.navbar"
+	const navbarSelector = "nav.navbar"
 	return m.page.Find(navbarSelector)
 }
 
-func (m *NavbarModule) loginedUL() *agouti.Selection {
-	const loginedUlSelector = ".nav-collapse #nav-right-logined"
-	return m.self().Find(loginedUlSelector)
+func (m *NavbarModule) userDropdown() *agouti.Selection {
+	const xpath = `//*[@id='navbar-collapse']/*[contains(@class, 'navbar-right')]/li[contains(@class, 'dropdown')][2]`
+	return m.self().FindByXPath(xpath)
+}
+
+func (m *NavbarModule) userLink() *agouti.Selection {
+	const selector = "a.dropdown-toggle"
+	return m.userDropdown().Find(selector)
 }
 
 // Values
 
 func (m *NavbarModule) userName() (string, error) {
-	const userNameSelector = "#nav-right-username"
-	userNameRaw, err := m.loginedUL().Find(userNameSelector).Text()
+	userNameRaw, err := m.userLink().Text()
 	if err != nil {
 		return "", err
 	}
-	rep := regexp.MustCompile(`^(.*)\((?:contestant|guest)\)$`)
+	rep := regexp.MustCompile(`^(.*) \((?:Contestant|Guest)\)$`)
 	return rep.ReplaceAllString(strings.TrimSpace(userNameRaw), "$1"), nil
 }
 
 // Funcs
 
 func (m *NavbarModule) IsLoggedIn() (bool, error) {
-	return m.loginedUL().Visible()
+	return m.userLink().Visible()
 }
 
 func (m *NavbarModule) GetUserName() (string, error) {

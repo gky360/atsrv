@@ -1,4 +1,4 @@
 package constants
 
 const Version = "v0.0.1"
-const AtCoderHost = "atcoder.jp"
+const AtCoderHost = "beta.atcoder.jp"

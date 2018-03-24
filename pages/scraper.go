@@ -14,16 +14,11 @@ const (
 
 type Scraper interface {
 	Page() *agouti.Page
-	TargetHost() string
 	TargetPath() string
 }
 
-func ContestHost(contestID string) string {
-	return contestID + ".contest." + constants.AtCoderHost
-}
-
 func TargetURL(s Scraper) string {
-	return "https://" + filepath.Join(s.TargetHost(), s.TargetPath())
+	return "https://" + filepath.Join(constants.AtCoderHost, s.TargetPath())
 }
 
 func At(s Scraper) (bool, error) {
