@@ -45,14 +45,17 @@ func (p *TasksPage) taskTRs() *agouti.MultiSelection {
 	return p.tasksTable().All(selector)
 }
 
+func (p *TasksPage) taskCols(index int) *agouti.MultiSelection {
+	return p.taskTRs().At(index).All("td")
+}
+
 // Values
 
 func (p *TasksPage) tasks() ([]*models.Task, error) {
-	tasksTRs := p.taskTRs()
-	cnt, _ := tasksTRs.Count()
+	cnt, _ := p.taskTRs().Count()
 	tasks := make([]*models.Task, cnt)
 	for i := range tasks {
-		taskCols := tasksTRs.At(i).All("td")
+		taskCols := p.taskCols(i)
 		if colsCnt, _ := taskCols.Count(); colsCnt != 5 {
 			return nil, fmt.Errorf("found invalid element")
 		}
@@ -75,4 +78,22 @@ func (p *TasksPage) tasks() ([]*models.Task, error) {
 
 func (p *TasksPage) GetTasks() ([]*models.Task, error) {
 	return p.tasks()
+}
+
+var ErrTaskNameNotFound = fmt.Errorf("task name not found")
+
+func (p *TasksPage) GetTaskID(taskName string) (string, error) {
+	cnt, _ := p.taskTRs().Count()
+	for i := 0; i < cnt; i++ {
+		taskCols := p.taskCols(i)
+		taskNameRaw, _ := taskCols.At(0).Text()
+		if strings.EqualFold(taskName, strings.TrimSpace(taskNameRaw)) {
+			taskIDHref, err := taskCols.At(0).Find("a").Attribute("href")
+			if err != nil {
+				return "", err
+			}
+			return path.Base(taskIDHref), nil
+		}
+	}
+	return "", ErrTaskNameNotFound
 }
