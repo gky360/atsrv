@@ -7,8 +7,9 @@ import (
 )
 
 type Submission struct {
-	ID     int    `json:"id" yaml:"id"`
-	Source string `json:"source" yaml:"source,omitempty"`
+	ID     int      `json:"id" yaml:"id"`
+	Source string   `json:"source" yaml:"source,omitempty"`
+	Lang   Language `json:"lang" yaml:"lang"`
 }
 
 func (sbm *Submission) ToYaml() (string, error) {

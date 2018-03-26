@@ -25,6 +25,7 @@ submissions:
         cout << ans << endl;
         return 0;
     }
+  lang: C++14 (GCC 5.4.1)
 - id: 1903518
   source: |
     // AtCoder Regular Contest 088
@@ -53,3 +54,4 @@ submissions:
         cout << ans << endl;
         return 0;
     }
+  lang: C++14 (GCC 5.4.1)
