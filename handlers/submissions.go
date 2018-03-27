@@ -2,15 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"github.com/gky360/atsrv/models"
 	"github.com/gky360/atsrv/pages"
 	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
 )
 
 type (
@@ -71,25 +68,29 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, submissionID, err := paramContestSubmission(c)
+	contestID, sbmID, err := paramContestSubmission(c)
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
-	fmt.Println(submissionID)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	rsp := new(RspGetSubmissions)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, "", models.LangNone)
+	if err != nil {
+		return err
 	}
 
-	return c.JSON(http.StatusOK, rsp.Submissions[0])
+	sbm, err := sbmsPage.GetSubmission(sbmID)
+	if err != nil {
+		if err == pages.ErrSubmissionNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("could not find submission with id %d", sbmID))
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sbm)
 }
 
 func (h *Handler) PostSubmission(c echo.Context) (err error) {
@@ -132,13 +133,13 @@ func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {
 	return
 }
 
-func paramContestSubmission(c echo.Context) (contestID string, submissionID int, err error) {
+func paramContestSubmission(c echo.Context) (contestID string, sbmID int, err error) {
 	contestID, err = paramContest(c)
 	if err != nil {
 		return
 	}
 
-	submissionID, err = strconv.Atoi(c.Param("submissionID"))
+	sbmID, err = strconv.Atoi(c.Param("submissionID"))
 	if err != nil {
 		err = echo.NewHTTPError(http.StatusBadRequest, "submission id is invalid.")
 	}

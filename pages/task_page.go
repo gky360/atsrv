@@ -2,8 +2,6 @@ package pages
 
 import (
 	"fmt"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/gky360/atsrv/models"
@@ -81,17 +79,12 @@ func (p *TaskPage) taskNameAndTitle() (string, string, error) {
 	return strings.TrimSpace(nameAndTitle[0]), strings.TrimSpace(nameAndTitle[1]), nil
 }
 
-func (p *TaskPage) taskScore() (int, error) {
+func (p *TaskPage) taskScore() int {
 	scoreRaw, err := p.scoreSpan().Text()
 	if err != nil {
-		return 0, nil
+		return 0
 	}
-	rep := regexp.MustCompile("[0-9]+")
-	if err != nil {
-		return 0, err
-	}
-	score, _ := strconv.Atoi(rep.FindString(scoreRaw))
-	return score, nil
+	return findInt(scoreRaw)
 }
 
 func (p *TaskPage) sample(num int) (*models.Sample, error) {
@@ -135,10 +128,6 @@ func (p *TaskPage) GetTask() (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskScore, err := p.taskScore()
-	if err != nil {
-		return nil, err
-	}
 	samples, err := p.samples()
 	if err != nil {
 		fmt.Println(err)
@@ -147,7 +136,7 @@ func (p *TaskPage) GetTask() (*models.Task, error) {
 		ID:      p.taskID,
 		Name:    taskName,
 		Title:   taskTitle,
-		Score:   taskScore,
+		Score:   p.taskScore(),
 		Samples: samples,
 	}, nil
 }

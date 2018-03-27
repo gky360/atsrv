@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
@@ -67,16 +66,6 @@ func (p *SubmissionsPage) sbmCols(index int) *agouti.MultiSelection {
 
 // Values
 
-func selectionToStr(sel *agouti.Selection) string {
-	raw, _ := sel.Text()
-	return strings.TrimSpace(raw)
-}
-
-func selectionToInt(sel *agouti.Selection) int {
-	ret, _ := strconv.Atoi(selectionToStr(sel))
-	return ret
-}
-
 func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 	cnt, _ := p.sbmTRs().Count()
 	sbms := make([]*models.Submission, cnt)
@@ -109,4 +98,19 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 
 func (p *SubmissionsPage) GetSubmissions() ([]*models.Submission, error) {
 	return p.sbms()
+}
+
+var ErrSubmissionNotFound = fmt.Errorf("submission not found")
+
+func (p *SubmissionsPage) GetSubmission(sbmID int) (*models.Submission, error) {
+	sbms, err := p.sbms()
+	if err != nil {
+		return nil, err
+	}
+	for _, sbm := range sbms {
+		if sbm.ID == sbmID {
+			return sbm, nil
+		}
+	}
+	return nil, ErrSubmissionNotFound
 }

@@ -3,6 +3,9 @@ package pages
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/gky360/atsrv/constants"
 	"github.com/sclevine/agouti"
@@ -50,4 +53,20 @@ func To(s Scraper) error {
 		}
 	}
 	return nil
+}
+
+var rexInt = regexp.MustCompile("[0-9]+")
+
+func findInt(str string) int {
+	ret, _ := strconv.Atoi(rexInt.FindString(str))
+	return ret
+}
+
+func selectionToStr(sel *agouti.Selection) string {
+	raw, _ := sel.Text()
+	return strings.TrimSpace(raw)
+}
+
+func selectionToInt(sel *agouti.Selection) int {
+	return findInt(selectionToStr(sel))
 }
