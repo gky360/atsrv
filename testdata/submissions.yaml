@@ -26,6 +26,12 @@ submissions:
         return 0;
     }
   lang: C++14 (GCC 5.4.1)
+  score: 300
+  source_length: 387
+  status: AC
+  time: 1
+  memory: 256
+  created_at: "2017-12-23 23:35:28"
 - id: 1903518
   source: |
     // AtCoder Regular Contest 088
@@ -55,3 +61,9 @@ submissions:
         return 0;
     }
   lang: C++14 (GCC 5.4.1)
+  score: 500
+  source_length: 479
+  status: 12/30
+  time: 5
+  memory: 512
+  created_at: "2017-12-24 11:18:54"
