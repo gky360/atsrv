@@ -1,17 +1,20 @@
 package pages
 
 import (
-	// "fmt"
-	// "path"
-	// "strings"
+	"fmt"
+	"path"
+	"strconv"
+	"strings"
 
-	// "github.com/gky360/atsrv/models"
+	"github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
 )
 
 type SubmissionsPage struct {
 	page      *agouti.Page
 	contestID string
+	taskID    string
+	Lang      models.Language
 }
 
 func (p *SubmissionsPage) Page() *agouti.Page {
@@ -73,17 +76,17 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 		if err != nil {
 			return nil, err
 		}
-		smbID, _ := strconv.Atoi(path.Base(smbIDHref))
+		sbmID, _ := strconv.Atoi(path.Base(sbmIDHref))
 
 		sbms[i] = &models.Submission{
-			ID:              sbmID,
-			sbmLang:         NewLanguage(selectionToStr(sbmCols.At(3))),
-			sbmScore:        selectionToInt(sbmCols.At(4)),
-			sbmSourceLength: selectionToInt(smbCols.At(5)),
-			sbmStatus:       selectionToStr(smbCols.At(6)),
-			smbTime:         selectionToInt(smbCols.At(7)),
-			sbmMemory:       selectionToInt(sbmCols.At(8)),
-			sbmCreatedAt:    selectionToStr(sbmCols.At(0)),
+			ID:           sbmID,
+			Lang:         models.NewLanguage(selectionToStr(sbmCols.At(3))),
+			Score:        selectionToInt(sbmCols.At(4)),
+			SourceLength: selectionToInt(sbmCols.At(5)),
+			Status:       selectionToStr(sbmCols.At(6)),
+			Time:         selectionToInt(sbmCols.At(7)),
+			Memory:       selectionToInt(sbmCols.At(8)),
+			CreatedAt:    selectionToStr(sbmCols.At(0)),
 		}
 	}
 	return sbms, nil

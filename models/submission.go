@@ -7,15 +7,15 @@ import (
 )
 
 type Submission struct {
-	ID          int      `json:"id" yaml:"id"`
-	Source      string   `json:"source" yaml:"source,omitempty"`
-	Lang        Language `json:"lang" yaml:"lang"`
-	Score       int      `json:"score" yaml:"score"`
-	SourceLengh int      `json:"source_length" yaml:"source_length"`
-	Status      string   `json:"status" yaml:"status"`
-	Time        int      `json:"time" yaml:"time"`
-	Memory      int      `json:"memory" yaml:"memory"`
-	CreatedAt   string   `json:"created_at" yaml:"created_at"`
+	ID           int      `json:"id" yaml:"id"`
+	Source       string   `json:"source" yaml:"source,omitempty"`
+	Lang         Language `json:"lang" yaml:"lang"`
+	Score        int      `json:"score" yaml:"score"`
+	SourceLength int      `json:"source_length" yaml:"source_length"`
+	Status       string   `json:"status" yaml:"status"`
+	Time         int      `json:"time" yaml:"time"`
+	Memory       int      `json:"memory" yaml:"memory"`
+	CreatedAt    string   `json:"created_at" yaml:"created_at"`
 }
 
 func (sbm *Submission) ToYaml() (string, error) {
