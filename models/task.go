@@ -46,8 +46,8 @@ func TasksToYaml(tasks []*Task) (string, error) {
 
 func TasksToYamlShort(_tasks []*Task) (string, error) {
 	tasks := make([]*Task, len(_tasks))
+	copy(tasks, _tasks)
 	for i := range tasks {
-		*tasks[i] = *_tasks[i]
 		tasks[i].Samples = nil
 	}
 	return TasksToYaml(tasks)
