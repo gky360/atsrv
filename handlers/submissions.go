@@ -8,13 +8,14 @@ import (
 	"strconv"
 
 	"github.com/gky360/atsrv/models"
+	"github.com/gky360/atsrv/pages"
 	"github.com/labstack/echo"
 	yaml "gopkg.in/yaml.v2"
 )
 
 type (
 	RspGetSubmissions struct {
-		Submissions []models.Submission `json:"submissions" yaml:"submissions"`
+		Submissions []*models.Submission `json:"submissions" yaml:"submissions"`
 	}
 )
 
@@ -30,19 +31,34 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
-	fmt.Println(taskName)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	taskID := ""
+	if taskName != "" {
+		tasksPage, err := pages.NewTasksPage(page, contestID)
+		if err != nil {
+			return err
+		}
+		taskID, err = tasksPage.GetTaskID(taskName)
+		if err != nil {
+			return err
+		}
+	}
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	if err != nil {
+		return err
+	}
+
+	sbms, err := sbmsPage.GetSubmissions()
+	if err != nil {
+		return err
+	}
+
 	rsp := new(RspGetSubmissions)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
-	}
+	rsp.Submissions = sbms
 
 	return c.JSON(http.StatusOK, rsp)
 }

@@ -104,3 +104,9 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 	}
 	return sbms, nil
 }
+
+// Funcs
+
+func (p *SubmissionsPage) GetSubmissions() ([]*models.Submission, error) {
+	return p.sbms()
+}
