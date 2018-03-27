@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ type SubmissionsPage struct {
 	page      *agouti.Page
 	contestID string
 	taskID    string
-	Lang      models.Language
+	lang      models.Language
 }
 
 func (p *SubmissionsPage) Page() *agouti.Page {
@@ -22,13 +23,25 @@ func (p *SubmissionsPage) Page() *agouti.Page {
 }
 
 func (p *SubmissionsPage) TargetPath() string {
-	return "/contests/" + p.contestID + "/submissions/me"
+	contestPath := "/contests/" + p.contestID + "/submissions/me"
+	u := &url.URL{Path: contestPath}
+	q := u.Query()
+	if p.taskID != "" {
+		q.Set("f.Task", p.taskID)
+	}
+	if p.lang != models.LangNone {
+		q.Set("f.Language", strconv.Itoa(p.lang.Int()))
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
-func NewSubmissionsPage(page *agouti.Page, contestID string) (*SubmissionsPage, error) {
+func NewSubmissionsPage(page *agouti.Page, contestID, taskID string, lang models.Language) (*SubmissionsPage, error) {
 	p := &SubmissionsPage{
-		page:      page,
-		contestID: contestID,
+		page,
+		contestID,
+		taskID,
+		lang,
 	}
 	if err := To(p); err != nil {
 		return nil, err

@@ -32,6 +32,10 @@ func (l Language) String() string {
 	return str
 }
 
+func (l Language) Int() int {
+	return int(l)
+}
+
 func NewLanguage(langStr string) Language {
 	l, ok := strToLang[langStr]
 	if !ok {
