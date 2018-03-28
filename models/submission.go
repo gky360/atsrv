@@ -27,12 +27,6 @@ func (sbm *Submission) ToYaml() (string, error) {
 	return fmt.Sprintf("---\n%s", string(d)), nil
 }
 
-func (_sbm *Submission) ToYamlShort() (string, error) {
-	sbm := _sbm
-	sbm.Source = ""
-	return sbm.ToYaml()
-}
-
 func SubmissionsToYaml(sbms []*Submission) (string, error) {
 	d, err := yaml.Marshal(&sbms)
 	if err != nil {
@@ -40,13 +34,4 @@ func SubmissionsToYaml(sbms []*Submission) (string, error) {
 	}
 
 	return fmt.Sprintf("---\n%s", string(d)), nil
-}
-
-func SubmissionsToYamlShort(_sbms []*Submission) (string, error) {
-	sbms := make([]*Submission, len(_sbms))
-	copy(sbms, _sbms)
-	for i := range sbms {
-		sbms[i].Source = ""
-	}
-	return SubmissionsToYaml(sbms)
 }
