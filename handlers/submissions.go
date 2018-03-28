@@ -108,8 +108,6 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	if taskName == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
-	fmt.Println(contestID)
-	fmt.Println(taskName)
 	sbm := new(models.Submission)
 	if err = c.Bind(sbm); err != nil {
 		return err

@@ -22,8 +22,8 @@ func (p *SubmissionsPage) Page() *agouti.Page {
 }
 
 func (p *SubmissionsPage) TargetPath() string {
-	contestPath := "/contests/" + p.contestID + "/submissions/me"
-	u := &url.URL{Path: contestPath}
+	sbmsPath := "/contests/" + p.contestID + "/submissions/me"
+	u := &url.URL{Path: sbmsPath}
 	q := u.Query()
 	if p.taskID != "" {
 		q.Set("f.Task", p.taskID)

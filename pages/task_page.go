@@ -68,6 +68,21 @@ func (p *TaskPage) samplePre(index int) *agouti.Selection {
 	return p.statement().Find(selector)
 }
 
+func (p *TaskPage) sbmForm() *agouti.Selection {
+	const selector = "#main-container form"
+	return p.Find(selector)
+}
+
+func (p *TaskPage) sbmLangSelect() *agouti.Selection {
+	const selector = "#select-lang select"
+	return p.sbmForm().Find(selector)
+}
+
+func (p *TaskPage) smbSourceField() *agouti.Selection {
+	const selector = "#sourceCode textarea"
+	return p.sbmForm().Find(selector)
+}
+
 // Values
 
 func (p *TaskPage) taskNameAndTitle() (string, string, error) {
@@ -139,4 +154,23 @@ func (p *TaskPage) GetTask() (*models.Task, error) {
 		Score:   p.taskScore(),
 		Samples: samples,
 	}, nil
+}
+
+func (p *TaskPage) SetLang(lang models.Language) error {
+	return p.sbmLangSelect().Select(lang.String())
+}
+
+func (p *TaskPage) SetSource(source string) error {
+	return p.sbmSourceField().Fill(source)
+}
+
+func (p *TaskPage) Submit(lang Language, source string) error {
+	if err := p.SetLang(lang); err != nil {
+		return err
+	}
+	if err := p.SetSource(source); err != nil {
+		return err
+	}
+	return nil
+	// return p.sbmForm().Submit()
 }
