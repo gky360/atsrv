@@ -116,9 +116,40 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "source should not be empty.")
 	}
 
-	// TODO: access page
+	page, err := getPage(h, user.ID)
+	if err != nil {
+		return err
+	}
+	tasksPage, err := pages.NewTasksPage(page, contestID)
+	if err != nil {
+		return err
+	}
+	taskID, err := tasksPage.GetTaskID(taskName)
+	if err != nil {
+		return err
+	}
+	taskPage, err := pages.NewTaskPage(page, contestID, taskID)
+	if err != nil {
+		return err
+	}
+	if err = taskPage.Submit(models.LangCpp14GCC, sbm.Source); err != nil {
+		return err
+	}
 
-	return c.JSON(http.StatusOK, sbm)
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	if err != nil {
+		return err
+	}
+	sbms, err := sbmsPage.GetSubmissions()
+	if err != nil {
+		return err
+	}
+
+	if len(sbms) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "failed to submit source code")
+	}
+
+	return c.JSON(http.StatusOK, sbms[0])
 }
 
 func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {

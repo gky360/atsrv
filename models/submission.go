@@ -13,8 +13,8 @@ type Submission struct {
 	Score        int      `json:"score" yaml:"score"`
 	SourceLength int      `json:"source_length" yaml:"source_length"`
 	Status       string   `json:"status" yaml:"status"`
-	Time         int      `json:"time" yaml:"time"`
-	Memory       int      `json:"memory" yaml:"memory"`
+	Time         int      `json:"time,omitempty" yaml:"time,omitempty"`
+	Memory       int      `json:"memory,omitempty" yaml:"memory,omitempty"`
 	CreatedAt    string   `json:"created_at" yaml:"created_at"`
 }
 

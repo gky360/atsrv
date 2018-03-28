@@ -71,10 +71,17 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 	sbms := make([]*models.Submission, cnt)
 	for i := range sbms {
 		sbmCols := p.sbmCols(i)
-		if colsCnt, _ := sbmCols.Count(); colsCnt != 10 {
+		isWJ := false
+		colsCnt, _ := sbmCols.Count()
+		switch colsCnt {
+		case 8:
+			isWJ = true
+		case 10:
+			isWJ = false
+		default:
 			return nil, fmt.Errorf("found invalid element")
 		}
-		sbmIDHref, err := sbmCols.At(9).Find("a").Attribute("href")
+		sbmIDHref, err := sbmCols.At(colsCnt - 1).Find("a").Attribute("href")
 		if err != nil {
 			return nil, err
 		}
@@ -85,10 +92,12 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 			Lang:         models.NewLanguage(selectionToStr(sbmCols.At(3))),
 			Score:        selectionToInt(sbmCols.At(4)),
 			SourceLength: selectionToInt(sbmCols.At(5)),
-			Status:       selectionToStr(sbmCols.At(6)),
-			Time:         selectionToInt(sbmCols.At(7)),
-			Memory:       selectionToInt(sbmCols.At(8)),
+			Status:       selectionToStr(sbmCols.At(6).Find("span")),
 			CreatedAt:    selectionToStr(sbmCols.At(0)),
+		}
+		if !isWJ {
+			sbms[i].Time = selectionToInt(sbmCols.At(7))
+			sbms[i].Memory = selectionToInt(sbmCols.At(8))
 		}
 	}
 	return sbms, nil
