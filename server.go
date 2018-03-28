@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/log"
-	"github.com/sclevine/agouti"
+	"crypto/rand"
 	"path/filepath"
 	"runtime"
 
 	"github.com/gky360/atsrv/handlers"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
+	"github.com/sclevine/agouti"
 )
 
 func main() {
@@ -25,10 +26,18 @@ func main() {
 	if err := driver.Start(); err != nil {
 		e.Logger.Error("Could not start chrome driver")
 		e.Logger.Fatal(err)
+		return
 	}
 	defer driver.Stop()
 
-	jwtSecret := []byte("hogehoge")
+	// generate secret for json web token
+	jwtSecret := make([]byte, 16)
+	_, err := rand.Read(jwtSecret)
+	if err != nil {
+		e.Logger.Error("Could not generate server secret")
+		e.Logger.Fatal(err)
+		return
+	}
 	h := handlers.NewHandler(exPath, driver, jwtSecret)
 
 	// Middlewares
