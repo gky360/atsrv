@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -10,6 +11,23 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
+)
+
+const (
+	version = "0.0.1"
+)
+
+var (
+	banner = fmt.Sprintf(`
+        __
+       /\ \__
+   __  \ \ ,_\   ____  _ __   __  __
+ /'__'\ \ \ \/  /',__\/\''__\/\ \/\ \
+/\ \L\.\_\ \ \_/\__, '\ \ \/ \ \ \_/ |
+\ \__/.\_\\ \__\/\____/\ \_\  \ \___/
+ \/__/\/_/ \/__/\/___/  \/_/   \/__/
+%38s
+`, "v"+version)
 )
 
 func main() {
@@ -71,5 +89,7 @@ func main() {
 	e.POST("/contests/:contestID/submissions", h.PostSubmission)
 
 	// Start server
+	e.HideBanner = true
+	fmt.Println(banner)
 	e.Logger.Fatal(e.Start(":1323"))
 }
