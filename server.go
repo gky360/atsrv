@@ -3,8 +3,6 @@ package main
 import (
 	"crypto/rand"
 	"fmt"
-	"path/filepath"
-	"runtime"
 
 	"github.com/gky360/atsrv/handlers"
 	"github.com/labstack/echo"
@@ -34,12 +32,6 @@ func main() {
 	e := echo.New()
 	e.Logger.SetLevel(log.INFO)
 
-	_, ex, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("No caller information")
-	}
-	exPath := filepath.Dir(ex)
-
 	driver := agouti.ChromeDriver()
 	if err := driver.Start(); err != nil {
 		e.Logger.Error("Could not start chrome driver")
@@ -56,7 +48,7 @@ func main() {
 		e.Logger.Fatal(err)
 		return
 	}
-	h := handlers.NewHandler(exPath, driver, jwtSecret)
+	h := handlers.NewHandler(driver, jwtSecret)
 
 	// Middlewares
 	e.Use(middleware.Logger())
