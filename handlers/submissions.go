@@ -2,19 +2,17 @@ package handlers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"github.com/gky360/atsrv/models"
+	"github.com/gky360/atsrv/pages"
 	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
 )
 
 type (
 	RspGetSubmissions struct {
-		Submissions []models.Submission `json:"submissions" yaml:"submissions"`
+		Submissions []*models.Submission `json:"submissions" yaml:"submissions"`
 	}
 )
 
@@ -30,19 +28,34 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
-	fmt.Println(taskName)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	taskID := ""
+	if taskName != "" {
+		tasksPage, err := pages.NewTasksPage(page, contestID)
+		if err != nil {
+			return err
+		}
+		taskID, err = tasksPage.GetTaskID(taskName)
+		if err != nil {
+			return err
+		}
+	}
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	if err != nil {
+		return err
+	}
+
+	sbms, err := sbmsPage.GetSubmissions()
+	if err != nil {
+		return err
+	}
+
 	rsp := new(RspGetSubmissions)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
-	}
+	rsp.Submissions = sbms
 
 	return c.JSON(http.StatusOK, rsp)
 }
@@ -55,25 +68,29 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, submissionID, err := paramContestSubmission(c)
+	contestID, sbmID, err := paramContestSubmission(c)
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
-	fmt.Println(submissionID)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "submissions.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	rsp := new(RspGetSubmissions)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, "", models.LangNone)
+	if err != nil {
+		return err
 	}
 
-	return c.JSON(http.StatusOK, rsp.Submissions[0])
+	sbm, err := sbmsPage.GetSubmission(sbmID)
+	if err != nil {
+		if err == pages.ErrSubmissionNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("could not find submission with id %d", sbmID))
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, sbm)
 }
 
 func (h *Handler) PostSubmission(c echo.Context) (err error) {
@@ -91,8 +108,6 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	if taskName == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
-	fmt.Println(contestID)
-	fmt.Println(taskName)
 	sbm := new(models.Submission)
 	if err = c.Bind(sbm); err != nil {
 		return err
@@ -101,9 +116,40 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "source should not be empty.")
 	}
 
-	// TODO: access page
+	page, err := getPage(h, user.ID)
+	if err != nil {
+		return err
+	}
+	tasksPage, err := pages.NewTasksPage(page, contestID)
+	if err != nil {
+		return err
+	}
+	taskID, err := tasksPage.GetTaskID(taskName)
+	if err != nil {
+		return err
+	}
+	taskPage, err := pages.NewTaskPage(page, contestID, taskID)
+	if err != nil {
+		return err
+	}
+	if err = taskPage.Submit(models.LangCpp14GCC, sbm.Source); err != nil {
+		return err
+	}
 
-	return c.JSON(http.StatusOK, sbm)
+	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	if err != nil {
+		return err
+	}
+	sbms, err := sbmsPage.GetSubmissions()
+	if err != nil {
+		return err
+	}
+
+	if len(sbms) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "failed to submit source code")
+	}
+
+	return c.JSON(http.StatusOK, sbms[0])
 }
 
 func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {
@@ -116,13 +162,13 @@ func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {
 	return
 }
 
-func paramContestSubmission(c echo.Context) (contestID string, submissionID int, err error) {
+func paramContestSubmission(c echo.Context) (contestID string, sbmID int, err error) {
 	contestID, err = paramContest(c)
 	if err != nil {
 		return
 	}
 
-	submissionID, err = strconv.Atoi(c.Param("submissionID"))
+	sbmID, err = strconv.Atoi(c.Param("submissionID"))
 	if err != nil {
 		err = echo.NewHTTPError(http.StatusBadRequest, "submission id is invalid.")
 	}

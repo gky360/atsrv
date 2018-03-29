@@ -2,18 +2,17 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
-	yaml "gopkg.in/yaml.v2"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gky360/atsrv/models"
+	"github.com/gky360/atsrv/pages"
+	"github.com/labstack/echo"
+	"github.com/sclevine/agouti"
 )
 
 type (
 	RspGetTasks struct {
-		Tasks []models.Task `json:"tasks" yaml:"tasks"`
+		Tasks []*models.Task `json:"tasks" yaml:"tasks"`
 	}
 )
 
@@ -29,18 +28,29 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
+	isFull := (c.QueryParam("full") == "true")
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	tasksPage, err := pages.NewTasksPage(page, contestID)
+	if err != nil {
+		return err
+	}
+
+	tasks, err := tasksPage.GetTasks()
+	if err != nil {
+		return err
+	}
+	if isFull {
+		if err := getTasksFull(page, contestID, tasks); err != nil {
+			return err
+		}
+	}
+
 	rsp := new(RspGetTasks)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
-	}
+	rsp.Tasks = tasks
 
 	return c.JSON(http.StatusOK, rsp)
 }
@@ -57,21 +67,33 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(contestID)
-	fmt.Println(taskName)
 
-	// TODO: access page
-	testFilePath := filepath.Join(h.pkgPath, "testdata", "tasks.yaml")
-	buf, err := ioutil.ReadFile(testFilePath)
+	page, err := getPage(h, user.ID)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	rsp := new(RspGetTasks)
-	if err = yaml.Unmarshal(buf, &rsp); err != nil {
-		panic(err)
+	tasksPage, err := pages.NewTasksPage(page, contestID)
+	if err != nil {
+		return err
+	}
+	taskID, err := tasksPage.GetTaskID(taskName)
+	if err != nil {
+		if err == pages.ErrTaskNameNotFound {
+			return echo.NewHTTPError(http.StatusUnprocessableEntity, fmt.Sprintf("could not find task name %s", taskName))
+		}
+		return err
+	}
+	taskPage, err := pages.NewTaskPage(page, contestID, taskID)
+	if err != nil {
+		return err
 	}
 
-	return c.JSON(http.StatusOK, rsp.Tasks[0])
+	task, err := taskPage.GetTask()
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, task)
 }
 
 func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
@@ -85,4 +107,18 @@ func paramContestTask(c echo.Context) (contestID, taskName string, err error) {
 		err = echo.NewHTTPError(http.StatusBadRequest, "task name should not be empty.")
 	}
 	return
+}
+
+func getTasksFull(page *agouti.Page, contestID string, tasks []*models.Task) error {
+	for i := range tasks {
+		taskPage, err := pages.NewTaskPage(page, contestID, tasks[i].ID)
+		if err != nil {
+			return err
+		}
+		tasks[i], err = taskPage.GetTask()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

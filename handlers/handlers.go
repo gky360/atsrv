@@ -11,7 +11,6 @@ import (
 
 type (
 	Handler struct {
-		pkgPath   string
 		driver    *agouti.WebDriver
 		jwtSecret []byte
 		userPages UserPages
@@ -25,9 +24,8 @@ type (
 	}
 )
 
-func NewHandler(pkgPath string, driver *agouti.WebDriver, jwtSecret []byte) *Handler {
+func NewHandler(driver *agouti.WebDriver, jwtSecret []byte) *Handler {
 	return &Handler{
-		pkgPath:   pkgPath,
 		driver:    driver,
 		jwtSecret: jwtSecret,
 		userPages: UserPages{},

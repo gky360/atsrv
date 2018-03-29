@@ -13,11 +13,11 @@ type Sample struct {
 }
 
 type Task struct {
-	ID      string   `json:"id" yaml:"id"`
-	Name    string   `json:"name" yaml:"name"`
-	Title   string   `json:"title" yaml:"title"`
-	Score   int      `json:"score" yaml:"score"`
-	Samples []Sample `json:"samples" yaml:"samples,omitempty"`
+	ID      string    `json:"id" yaml:"id"`
+	Name    string    `json:"name" yaml:"name"`
+	Title   string    `json:"title" yaml:"title"`
+	Score   int       `json:"score,omitempty" yaml:"score,omitempty"`
+	Samples []*Sample `json:"samples,omitempty" yaml:"samples,omitempty"`
 }
 
 func (task *Task) ToYaml() (string, error) {
@@ -35,7 +35,7 @@ func (_task *Task) ToYamlShort() (string, error) {
 	return task.ToYaml()
 }
 
-func TasksToYaml(tasks []Task) (string, error) {
+func TasksToYaml(tasks []*Task) (string, error) {
 	d, err := yaml.Marshal(&tasks)
 	if err != nil {
 		return "", err
@@ -44,8 +44,9 @@ func TasksToYaml(tasks []Task) (string, error) {
 	return fmt.Sprintf("---\n%s", string(d)), nil
 }
 
-func TasksToYamlShort(_tasks []Task) (string, error) {
-	tasks := _tasks
+func TasksToYamlShort(_tasks []*Task) (string, error) {
+	tasks := make([]*Task, len(_tasks))
+	copy(tasks, _tasks)
 	for i := range tasks {
 		tasks[i].Samples = nil
 	}

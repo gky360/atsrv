@@ -22,7 +22,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid user id or password.")
 	}
 
-	if isLoggedIn(h, user.ID) {
+	if isLoggedIn(h, user.ID, pages.PracticeContestID) {
 		// when the user has already logged in, do not return token
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("user %s has aready logged in.", user.ID))
 	}
@@ -31,21 +31,37 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	pageObj, err := pages.NewTasksPage(page)
+	loginPage, err := pages.NewLoginPage(page)
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
 	}
-	fmt.Println(pageObj.GetPage().Title())
 
-	// TODO: access page
-	// send user id and password
+	// Send user id and password
+	if err := loginPage.Login(user.ID, user.Password); err != nil {
+		return err
+	}
+	if !isLoggedIn(h, user.ID, pages.PracticeContestID) {
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", user.ID))
+	}
 
 	// Generate encoded token and send it as response
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = user.ID
 	user.Token, err = token.SignedString([]byte(h.jwtSecret))
+	if err != nil {
+		stopPage(h, user.ID)
+		return err
+	}
+
+	// Get user name
+	contestPage, err := pages.NewContestPage(page, pages.PracticeContestID)
+	if err != nil {
+		stopPage(h, user.ID)
+		return err
+	}
+	user.Name, err = contestPage.Navbar().GetUserName()
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
@@ -69,7 +85,7 @@ func (h *Handler) Logout(c echo.Context) (err error) {
 
 func (h *Handler) Me(c echo.Context) (err error) {
 	fmt.Println("h.Me")
-	user, err := currentUser(h, c)
+	user, err := currentUserWithContestID(h, c, pages.PracticeContestID)
 	if err != nil {
 		return err
 	}
@@ -84,30 +100,49 @@ func userIDFromToken(c echo.Context) string {
 	return claims["id"].(string)
 }
 
-func isLoggedIn(h *Handler, userID string) bool {
-	_, err := getPage(h, userID)
+func isLoggedIn(h *Handler, userID string, contestID string) bool {
+	contestPage, err := getContestPage(h, userID, contestID)
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
-	// TODO: access page
-	// check if the user logged in to AtCoder
+	// Check if the user logged in to AtCoder
+	ret, err := contestPage.Navbar().IsLoggedIn()
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 
-	return true
+	return ret
 }
 
-func currentUser(h *Handler, c echo.Context) (*models.User, error) {
+func currentUserWithContestID(h *Handler, c echo.Context, contestID string) (*models.User, error) {
 	user := new(models.User)
 	user.ID = userIDFromToken(c)
-	loggedIn := isLoggedIn(h, user.ID)
+	loggedIn := isLoggedIn(h, user.ID, contestID)
 	if !loggedIn {
 		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
 	}
 
-	// TODO: access page
-	// get user name
-	user.Name = "myname"
+	// Get user name
+	contestPage, err := getContestPage(h, user.ID, contestID)
+	if err != nil {
+		return nil, err
+	}
+	userName, err := contestPage.Navbar().GetUserName()
+	if err != nil {
+		return nil, err
+	}
+	user.Name = userName
 
 	return user, nil
+}
+
+func currentUser(h *Handler, c echo.Context) (*models.User, error) {
+	contestID, err := paramContest(c)
+	if err != nil {
+		return nil, err
+	}
+	return currentUserWithContestID(h, c, contestID)
 }

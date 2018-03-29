@@ -1,28 +1,99 @@
 package pages
 
 import (
+	"fmt"
+	"path"
+	"strings"
+
+	"github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
 )
 
-const targetPath string = "/assignments"
-
 type TasksPage struct {
-	page *agouti.Page
+	page      *agouti.Page
+	contestID string
 }
 
-func NewTasksPage(page *agouti.Page) (Page, error) {
-	p := new(TasksPage)
-	p.page = page
-	if err := At(p); err != nil {
+func (p *TasksPage) Page() *agouti.Page {
+	return p.page
+}
+
+func (p *TasksPage) TargetPath() string {
+	return "/contests/" + p.contestID + "/tasks"
+}
+
+func NewTasksPage(page *agouti.Page, contestID string) (*TasksPage, error) {
+	p := &TasksPage{
+		page:      page,
+		contestID: contestID,
+	}
+	if err := To(p); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (p *TasksPage) GetTargetPath() string {
-	return targetPath
+// Elements
+
+func (p *TasksPage) tasksTable() *agouti.Selection {
+	const selector = "#main-container .table"
+	return p.page.Find(selector)
 }
 
-func (p *TasksPage) GetPage() *agouti.Page {
-	return p.page
+func (p *TasksPage) taskTRs() *agouti.MultiSelection {
+	const selector = "tbody tr"
+	return p.tasksTable().All(selector)
+}
+
+func (p *TasksPage) taskCols(index int) *agouti.MultiSelection {
+	return p.taskTRs().At(index).All("td")
+}
+
+// Values
+
+func (p *TasksPage) tasks() ([]*models.Task, error) {
+	cnt, _ := p.taskTRs().Count()
+	tasks := make([]*models.Task, cnt)
+	for i := range tasks {
+		taskCols := p.taskCols(i)
+		if colsCnt, _ := taskCols.Count(); colsCnt != 5 {
+			return nil, fmt.Errorf("found invalid element")
+		}
+		taskIDHref, err := taskCols.At(0).Find("a").Attribute("href")
+		if err != nil {
+			return nil, err
+		}
+		taskNameRaw, _ := taskCols.At(0).Text()
+		taskTitleRaw, _ := taskCols.At(1).Text()
+		tasks[i] = &models.Task{
+			ID:    path.Base(taskIDHref),
+			Name:  strings.TrimSpace(taskNameRaw),
+			Title: strings.TrimSpace(taskTitleRaw),
+		}
+	}
+	return tasks, nil
+}
+
+// Funcs
+
+func (p *TasksPage) GetTasks() ([]*models.Task, error) {
+	return p.tasks()
+}
+
+var ErrTaskNameNotFound = fmt.Errorf("task name not found")
+
+func (p *TasksPage) GetTaskID(taskName string) (string, error) {
+	cnt, _ := p.taskTRs().Count()
+	for i := 0; i < cnt; i++ {
+		taskCols := p.taskCols(i)
+		taskNameRaw, _ := taskCols.At(0).Text()
+		if strings.EqualFold(taskName, strings.TrimSpace(taskNameRaw)) {
+			taskIDHref, err := taskCols.At(0).Find("a").Attribute("href")
+			if err != nil {
+				return "", err
+			}
+			return path.Base(taskIDHref), nil
+		}
+	}
+	return "", ErrTaskNameNotFound
 }
