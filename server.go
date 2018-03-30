@@ -3,9 +3,10 @@ package main
 import (
 	// "crypto/rand"
 	"fmt"
+	"os"
 
 	"github.com/gky360/atsrv/handlers"
-	"github.com/gky360/atsrv/pages"
+	"github.com/howeyc/gopass"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -30,44 +31,31 @@ var (
 `, "v"+version)
 )
 
-func login(page *agouti.Page, userID, password string) error {
-	loginPage, err := pages.NewLoginPage(page)
-	if err != nil {
-		return err
-	}
-
-	// Send user id and password
-	if err := loginPage.Login(userID, password); err != nil {
-		return err
-	}
-	if !isLoggedIn(h, user.ID, pages.PracticeContestID) {
-		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", user.ID))
-	}
-
-	return nil
-}
-
-func main() {
+func run() int {
 	e := echo.New()
 	e.Logger.SetLevel(log.INFO)
 
 	var config handlers.AtsrvConfig
 	if err := envconfig.Process("atsrv", &config); err != nil {
-		e.Logger.Fatal(err)
-		return
+		e.Logger.Error(err)
+		return 1
 	}
 
 	driver := agouti.ChromeDriver()
 	if err := driver.Start(); err != nil {
-		e.Logger.Error("Could not start chrome driver")
-		e.Logger.Fatal(err)
-		return
+		e.Logger.Error("Could not start chromedriver")
+		e.Logger.Error(err)
+		return 1
 	}
 	defer driver.Stop()
 	page, err := driver.NewPage()
 	if err != nil {
-		return nil, err
+		e.Logger.Error("Could not open page in chromedriver")
+		e.Logger.Error(err)
+		return 1
 	}
+	defer page.Destroy()
+	defer fmt.Println("Stopping server...")
 
 	// get user id and password
 	if config.UserID == "" {
@@ -77,13 +65,18 @@ func main() {
 	fmt.Print("AtCoder password: ")
 	password, err := gopass.GetPasswd()
 	if err != nil {
-		return err
-	}
-	if err := login(page, config.UserID, password); err != nil {
-		return err
+		e.Logger.Error("Could not get password from input")
+		e.Logger.Error(err)
+		return 1
 	}
 
 	h := handlers.NewHandler(page, config)
+
+	if err := handlers.Login(h, string(password)); err != nil {
+		e.Logger.Error("Failed to login to AtCoder. Please make suer your user id and password are correct.")
+		e.Logger.Error(err)
+		return 1
+	}
 
 	// Middlewares
 	e.Use(middleware.Logger())
@@ -107,4 +100,10 @@ func main() {
 	e.HideBanner = true
 	fmt.Println(banner)
 	e.Logger.Fatal(e.Start(":1323"))
+
+	return 0
+}
+
+func main() {
+	os.Exit(run())
 }

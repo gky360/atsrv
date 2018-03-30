@@ -20,8 +20,25 @@ func (h *Handler) Me(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, user)
 }
 
-func isLoggedIn(h *Handler, userID string, contestID string) bool {
-	contestPage, err := getContestPage(h, userID, contestID)
+func Login(h *Handler, password string) error {
+	loginPage, err := pages.NewLoginPage(h.page)
+	if err != nil {
+		return err
+	}
+
+	// Send user id and password
+	if err := loginPage.Login(h.config.UserID, password); err != nil {
+		return err
+	}
+	if !isLoggedIn(h, pages.PracticeContestID) {
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", h.config.UserID))
+	}
+
+	return nil
+}
+
+func isLoggedIn(h *Handler, contestID string) bool {
+	contestPage, err := getContestPage(h, contestID)
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -40,13 +57,13 @@ func isLoggedIn(h *Handler, userID string, contestID string) bool {
 func currentUserWithContestID(h *Handler, c echo.Context, contestID string) (*models.User, error) {
 	user := new(models.User)
 	user.ID = h.config.UserID
-	loggedIn := isLoggedIn(h, user.ID, contestID)
+	loggedIn := isLoggedIn(h, contestID)
 	if !loggedIn {
 		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
 	}
 
 	// Get user name
-	contestPage, err := getContestPage(h, user.ID, contestID)
+	contestPage, err := getContestPage(h, contestID)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 		return err
 	}
 
-	contestPage, err := getContestPage(h, user.ID, contestID)
+	contestPage, err := getContestPage(h, contestID)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (h *Handler) Join(c echo.Context) (err error) {
 		return err
 	}
 
-	contestPage, err := getContestPage(h, user.ID, contestID)
+	contestPage, err := getContestPage(h, contestID)
 	if err != nil {
 		return err
 	}
@@ -77,6 +77,6 @@ func paramContest(c echo.Context) (string, error) {
 	return contestID, nil
 }
 
-func getContestPage(h *Handler, userID string, contestID string) (*pages.ContestPage, error) {
+func getContestPage(h *Handler, contestID string) (*pages.ContestPage, error) {
 	return pages.NewContestPage(h.page, contestID)
 }
