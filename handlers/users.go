@@ -49,7 +49,6 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = user.ID
-	user.Token, err = token.SignedString([]byte(h.jwtSecret))
 	if err != nil {
 		stopPage(h, user.ID)
 		return err
@@ -74,7 +73,7 @@ func (h *Handler) Login(c echo.Context) (err error) {
 func (h *Handler) Logout(c echo.Context) (err error) {
 	fmt.Println("h.Logout")
 
-	userID := userIDFromToken(c)
+	userID := h.config.UserID
 
 	if err = stopPage(h, userID); err != nil {
 		return err
@@ -92,12 +91,6 @@ func (h *Handler) Me(c echo.Context) (err error) {
 	c.Logger().Info(user.ID)
 
 	return c.JSON(http.StatusOK, user)
-}
-
-func userIDFromToken(c echo.Context) string {
-	token := c.Get("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	return claims["id"].(string)
 }
 
 func isLoggedIn(h *Handler, userID string, contestID string) bool {
@@ -119,7 +112,7 @@ func isLoggedIn(h *Handler, userID string, contestID string) bool {
 
 func currentUserWithContestID(h *Handler, c echo.Context, contestID string) (*models.User, error) {
 	user := new(models.User)
-	user.ID = userIDFromToken(c)
+	user.ID = h.config.UserID
 	loggedIn := isLoggedIn(h, user.ID, contestID)
 	if !loggedIn {
 		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("user %s is not logged in.", user.ID))
