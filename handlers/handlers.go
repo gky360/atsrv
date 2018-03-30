@@ -10,9 +10,14 @@ import (
 )
 
 type (
+	AtsrvConfig struct {
+		User string
+	}
+
 	Handler struct {
 		driver    *agouti.WebDriver
 		userPages UserPages
+		Config    AtsrvConfig
 	}
 
 	UserPages map[string]*agouti.Page
