@@ -1,11 +1,11 @@
 package main
 
 import (
-	"crypto/rand"
+	// "crypto/rand"
 	"fmt"
 
 	"github.com/gky360/atsrv/handlers"
-	"github.com/howeyc/gopass"
+	"github.com/gky360/atsrv/pages"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -30,9 +30,32 @@ var (
 `, "v"+version)
 )
 
+func login(page *agouti.Page, userID, password string) error {
+	loginPage, err := pages.NewLoginPage(page)
+	if err != nil {
+		return err
+	}
+
+	// Send user id and password
+	if err := loginPage.Login(userID, password); err != nil {
+		return err
+	}
+	if !isLoggedIn(h, user.ID, pages.PracticeContestID) {
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to login to AtCoder as %s.", user.ID))
+	}
+
+	return nil
+}
+
 func main() {
 	e := echo.New()
 	e.Logger.SetLevel(log.INFO)
+
+	var config handlers.AtsrvConfig
+	if err := envconfig.Process("atsrv", &config); err != nil {
+		e.Logger.Fatal(err)
+		return
+	}
 
 	driver := agouti.ChromeDriver()
 	if err := driver.Start(); err != nil {
@@ -41,7 +64,26 @@ func main() {
 		return
 	}
 	defer driver.Stop()
-	h := handlers.NewHandler(driver)
+	page, err := driver.NewPage()
+	if err != nil {
+		return nil, err
+	}
+
+	// get user id and password
+	if config.UserID == "" {
+		fmt.Print("AtCoder user id: ")
+		fmt.Scan(&config.UserID)
+	}
+	fmt.Print("AtCoder password: ")
+	password, err := gopass.GetPasswd()
+	if err != nil {
+		return err
+	}
+	if err := login(page, config.UserID, password); err != nil {
+		return err
+	}
+
+	h := handlers.NewHandler(driver, config)
 
 	// Middlewares
 	e.Use(middleware.Logger())

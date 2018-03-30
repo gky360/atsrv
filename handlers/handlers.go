@@ -11,13 +11,13 @@ import (
 
 type (
 	AtsrvConfig struct {
-		User string
+		UserID string
 	}
 
 	Handler struct {
 		driver    *agouti.WebDriver
 		userPages UserPages
-		Config    AtsrvConfig
+		config    AtsrvConfig
 	}
 
 	UserPages map[string]*agouti.Page
@@ -28,10 +28,11 @@ type (
 	}
 )
 
-func NewHandler(driver *agouti.WebDriver) *Handler {
+func NewHandler(driver *agouti.WebDriver, config AtsrvConfig) *Handler {
 	return &Handler{
 		driver:    driver,
 		userPages: UserPages{},
+		config:    config,
 	}
 }
 
