@@ -7,8 +7,6 @@ Backend for atcli ( https://github.com/gky360/atcli )
 | method | need token | need logged in | path |
 |---|---|---|---|
 | GET  | n | n | / |
-| POST | n | n | /login |
-| POST | y | n | /logout |
 | GET  | y | y | /me |
 | GET  | y | y | /contests/arc090 |
 | POST | y | y | /contests/arc090/join |
