@@ -78,10 +78,5 @@ func paramContest(c echo.Context) (string, error) {
 }
 
 func getContestPage(h *Handler, userID string, contestID string) (*pages.ContestPage, error) {
-	page, err := getPage(h, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return pages.NewContestPage(page, contestID)
+	return pages.NewContestPage(h.page, contestID)
 }

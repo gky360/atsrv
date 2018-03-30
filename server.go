@@ -83,7 +83,7 @@ func main() {
 		return err
 	}
 
-	h := handlers.NewHandler(driver, config)
+	h := handlers.NewHandler(page, config)
 
 	// Middlewares
 	e.Use(middleware.Logger())

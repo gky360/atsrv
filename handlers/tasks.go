@@ -30,11 +30,7 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 	}
 	isFull := (c.QueryParam("full") == "true")
 
-	page, err := getPage(h, user.ID)
-	if err != nil {
-		return err
-	}
-	tasksPage, err := pages.NewTasksPage(page, contestID)
+	tasksPage, err := pages.NewTasksPage(h.page, contestID)
 	if err != nil {
 		return err
 	}
@@ -44,7 +40,7 @@ func (h *Handler) GetTasks(c echo.Context) (err error) {
 		return err
 	}
 	if isFull {
-		if err := getTasksFull(page, contestID, tasks); err != nil {
+		if err := getTasksFull(h.page, contestID, tasks); err != nil {
 			return err
 		}
 	}
@@ -68,11 +64,7 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 		return err
 	}
 
-	page, err := getPage(h, user.ID)
-	if err != nil {
-		return err
-	}
-	tasksPage, err := pages.NewTasksPage(page, contestID)
+	tasksPage, err := pages.NewTasksPage(h.page, contestID)
 	if err != nil {
 		return err
 	}
@@ -83,7 +75,7 @@ func (h *Handler) GetTask(c echo.Context) (err error) {
 		}
 		return err
 	}
-	taskPage, err := pages.NewTaskPage(page, contestID, taskID)
+	taskPage, err := pages.NewTaskPage(h.page, contestID, taskID)
 	if err != nil {
 		return err
 	}
