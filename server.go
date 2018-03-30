@@ -1,7 +1,8 @@
 package main
 
 import (
-	// "crypto/rand"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -30,6 +31,22 @@ var (
 %38s
 `, "v"+version)
 )
+
+func generateRandomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
+func generateRandomString(n int) (string, error) {
+	b, err := generateRandomBytes(n)
+	return base64.URLEncoding.EncodeToString(b), err
+}
 
 func run() int {
 	e := echo.New()
@@ -70,7 +87,13 @@ func run() int {
 		return 1
 	}
 
-	h := handlers.NewHandler(page, config)
+	token, err := generateRandomString(8)
+	if err != nil {
+		e.Logger.Error("Could not generate server secret")
+		e.Logger.Error(err)
+		return 1
+	}
+	h := handlers.NewHandler(page, config, token)
 
 	if err := handlers.Login(h, string(password)); err != nil {
 		e.Logger.Error("Failed to login to AtCoder. Please make suer your user id and password are correct.")
@@ -99,6 +122,11 @@ func run() int {
 	// Start server
 	e.HideBanner = true
 	fmt.Println(banner)
+
+	fmt.Println("Token:")
+	fmt.Println(token)
+	fmt.Println()
+
 	e.Logger.Fatal(e.Start(":1323"))
 
 	return 0

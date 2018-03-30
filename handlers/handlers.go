@@ -10,12 +10,13 @@ import (
 
 type (
 	AtsrvConfig struct {
-		UserID string
+		UserID string `envconfig:"user_id"`
 	}
 
 	Handler struct {
 		page   *agouti.Page
 		config AtsrvConfig
+		token  string
 	}
 
 	RspRoot struct {
@@ -23,10 +24,11 @@ type (
 	}
 )
 
-func NewHandler(page *agouti.Page, config AtsrvConfig) *Handler {
+func NewHandler(page *agouti.Page, config AtsrvConfig, token string) *Handler {
 	return &Handler{
 		page:   page,
 		config: config,
+		token:  token,
 	}
 }
 
