@@ -39,29 +39,10 @@ func main() {
 		return
 	}
 	defer driver.Stop()
-
-	// generate secret for json web token
-	jwtSecret := make([]byte, 16)
-	_, err := rand.Read(jwtSecret)
-	if err != nil {
-		e.Logger.Error("Could not generate server secret")
-		e.Logger.Fatal(err)
-		return
-	}
-	h := handlers.NewHandler(driver, jwtSecret)
+	h := handlers.NewHandler(driver)
 
 	// Middlewares
 	e.Use(middleware.Logger())
-	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte(jwtSecret),
-		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/" || c.Path() == "/login" {
-				// Skip authentication for root and login requests
-				return true
-			}
-			return false
-		},
-	}))
 
 	// Routes
 	e.GET("/", h.Root)
