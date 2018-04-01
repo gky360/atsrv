@@ -14,6 +14,7 @@ type SubmissionsPage struct {
 	page      *agouti.Page
 	contestID string
 	taskID    string
+	status    string
 	lang      models.Language
 }
 
@@ -28,6 +29,9 @@ func (p *SubmissionsPage) TargetPath() string {
 	if p.taskID != "" {
 		q.Set("f.Task", p.taskID)
 	}
+	if p.status != "" {
+		q.Set("f.Status", p.status)
+	}
 	if p.lang != models.LangNone {
 		q.Set("f.Language", strconv.Itoa(p.lang.Int()))
 	}
@@ -35,11 +39,12 @@ func (p *SubmissionsPage) TargetPath() string {
 	return u.String()
 }
 
-func NewSubmissionsPage(page *agouti.Page, contestID, taskID string, lang models.Language) (*SubmissionsPage, error) {
+func NewSubmissionsPage(page *agouti.Page, contestID, taskID, status string, lang models.Language) (*SubmissionsPage, error) {
 	p := &SubmissionsPage{
 		page,
 		contestID,
 		taskID,
+		status,
 		lang,
 	}
 	if err := To(p); err != nil {

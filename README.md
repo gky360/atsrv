@@ -18,6 +18,6 @@ Backend for atcli ( https://github.com/gky360/atcli )
 | GET  | y | y | /contests/arc090/tasks?full=true |
 | GET  | y | y | /contests/arc090/tasks/d |
 | GET  | y | y | /contests/arc090/submissions |
-| GET  | y | y | /contests/arc090/submissions?task_name=d |
+| GET  | y | y | /contests/arc090/submissions?task_name=d&status=AC |
 | GET  | y | y | /contests/arc090/submissions/2167890 |
 | POST | y | y | /contests/arc090/submissions?task_name=d |
