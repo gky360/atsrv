@@ -144,7 +144,7 @@ func run() int {
 	fmt.Println(token)
 	fmt.Println()
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(config.Host + ":" + config.Port))
 
 	return 0
 }
