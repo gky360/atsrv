@@ -104,6 +104,23 @@ func run() int {
 	// Middlewares
 	e.Use(middleware.Logger())
 
+	basicAuthConfig := middleware.BasicAuthConfig{
+		Skipper: func(c echo.Context) bool {
+			if c.Path() == "/" {
+				// Skip authentication for root endpoint
+				return true
+			}
+			return false
+		},
+		Validator: func(authUserID, authToken string, c echo.Context) (bool, error) {
+			if authUserID == config.UserID && authToken == token {
+				return true, nil
+			}
+			return false, nil
+		},
+	}
+	e.Use(middleware.BasicAuthWithConfig(basicAuthConfig))
+
 	// Routes
 	e.GET("/", h.Root)
 
@@ -123,7 +140,7 @@ func run() int {
 	e.HideBanner = true
 	fmt.Println(banner)
 
-	fmt.Println("Token:")
+	fmt.Println("AuthToken:")
 	fmt.Println(token)
 	fmt.Println()
 
