@@ -91,6 +91,11 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 			return nil, err
 		}
 		sbmID, _ := strconv.Atoi(path.Base(sbmIDHref))
+		taskIDHref, err := sbmCols.At(1).Find("a").Attribute("href")
+		if err != nil {
+			return nil, err
+		}
+		taskID := path.Base(taskIDHref)
 
 		sbms[i] = &models.Submission{
 			ID:           sbmID,
@@ -99,6 +104,10 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 			SourceLength: selectionToInt(sbmCols.At(5)),
 			Status:       selectionToStr(sbmCols.At(6).Find("span")),
 			CreatedAt:    selectionToStr(sbmCols.At(0)),
+			Task: models.NewTaskWithFullName(
+				taskID,
+				selectionToStr(sbmCols.At(1)),
+			),
 		}
 		if !isWJ {
 			sbms[i].Time = selectionToInt(sbmCols.At(7))

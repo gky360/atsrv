@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -18,6 +19,18 @@ type Task struct {
 	Title   string    `json:"title" yaml:"title"`
 	Score   int       `json:"score,omitempty" yaml:"score,omitempty"`
 	Samples []*Sample `json:"samples,omitempty" yaml:"samples,omitempty"`
+}
+
+func NewTaskWithFullName(taskID, fullName string) *Task {
+	nameAndTitle := strings.SplitN(fullName, " - ", 2)
+	if len(nameAndTitle) != 2 {
+		return &Task{Title: fullName}
+	}
+	return &Task{
+		ID:    taskID,
+		Name:  nameAndTitle[0],
+		Title: nameAndTitle[1],
+	}
 }
 
 func (task *Task) ToYaml() (string, error) {
