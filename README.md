@@ -2,6 +2,10 @@
 
 Backend for atcli ( https://github.com/gky360/atcli )
 
+## Requirements
+
+- chromedriver >= 2.35
+
 ## Endpoints
 
 | method | need token | need logged in | path |

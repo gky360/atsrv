@@ -10,9 +10,11 @@ import (
 
 type (
 	AtsrvConfig struct {
-		UserID string `envconfig:"user_id"`
-		Host   string `default:""`
-		Port   string `default:"4700"`
+		UserID   string `envconfig:"user_id"`
+		Host     string `default:""`
+		Port     string `default:"4700"`
+		Headless bool
+		Debug    bool
 	}
 
 	Handler struct {

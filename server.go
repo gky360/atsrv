@@ -50,15 +50,32 @@ func generateRandomString(n int) (string, error) {
 
 func run() int {
 	e := echo.New()
-	e.Logger.SetLevel(log.INFO)
 
 	var config handlers.AtsrvConfig
 	if err := envconfig.Process("atsrv", &config); err != nil {
 		e.Logger.Error(err)
 		return 1
 	}
+	if config.Debug {
+		e.Logger.SetLevel(log.DEBUG)
+	} else {
+		e.Logger.SetLevel(log.INFO)
+	}
 
-	driver := agouti.ChromeDriver()
+	chromeOptions := []agouti.Option{}
+	if config.Headless {
+		chromeOptions = append(chromeOptions, agouti.ChromeOptions(
+			"args",
+			[]string{
+				"--headless",
+				"--disable-gpu",
+			}),
+		)
+	}
+	if config.Debug {
+		chromeOptions = append(chromeOptions, agouti.Debug)
+	}
+	driver := agouti.ChromeDriver(chromeOptions...)
 	if err := driver.Start(); err != nil {
 		e.Logger.Error("Could not start chromedriver")
 		e.Logger.Error(err)
