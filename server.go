@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gky360/atsrv/constants"
 	"github.com/gky360/atsrv/handlers"
 	"github.com/howeyc/gopass"
 	"github.com/kelseyhightower/envconfig"
@@ -13,10 +14,6 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
-)
-
-const (
-	version = "0.0.1"
 )
 
 var (
@@ -29,7 +26,7 @@ var (
 \ \__/.\_\\ \__\/\____/\ \_\  \ \___/
  \/__/\/_/ \/__/\/___/  \/_/   \/__/
 %38s
-`, "v"+version)
+`, constants.Version)
 )
 
 func generateRandomBytes(n int) ([]byte, error) {
