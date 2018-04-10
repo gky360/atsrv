@@ -32,6 +32,9 @@ submissions:
   time: 1
   memory: 256
   created_at: "2017-12-23 23:35:28"
+  task:
+    name: C
+    title: Multiple Gift
 - id: 1903518
   source: |
     // AtCoder Regular Contest 088
@@ -67,3 +70,6 @@ submissions:
   time: 5
   memory: 512
   created_at: "2017-12-24 11:18:54"
+  task:
+    name: D
+    title: Wide Flip

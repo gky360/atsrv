@@ -2,17 +2,18 @@ package main
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"os"
 
+	"github.com/gky360/atsrv/constants"
 	"github.com/gky360/atsrv/handlers"
+	"github.com/howeyc/gopass"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
-)
-
-const (
-	version = "0.0.1"
 )
 
 var (
@@ -25,49 +26,118 @@ var (
 \ \__/.\_\\ \__\/\____/\ \_\  \ \___/
  \/__/\/_/ \/__/\/___/  \/_/   \/__/
 %38s
-`, "v"+version)
+`, constants.Version)
 )
 
-func main() {
-	e := echo.New()
-	e.Logger.SetLevel(log.INFO)
+func generateRandomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return nil, err
+	}
 
-	driver := agouti.ChromeDriver()
+	return b, nil
+}
+
+func generateRandomString(n int) (string, error) {
+	b, err := generateRandomBytes(n)
+	return base64.URLEncoding.EncodeToString(b), err
+}
+
+func run() int {
+	e := echo.New()
+
+	var config handlers.AtsrvConfig
+	if err := envconfig.Process("atsrv", &config); err != nil {
+		e.Logger.Error(err)
+		return 1
+	}
+	if config.Debug {
+		e.Logger.SetLevel(log.DEBUG)
+	} else {
+		e.Logger.SetLevel(log.INFO)
+	}
+
+	chromeOptions := []agouti.Option{}
+	if config.Headless {
+		chromeOptions = append(chromeOptions, agouti.ChromeOptions(
+			"args",
+			[]string{
+				"--headless",
+				"--disable-gpu",
+			}),
+		)
+	}
+	if config.Debug {
+		chromeOptions = append(chromeOptions, agouti.Debug)
+	}
+	driver := agouti.ChromeDriver(chromeOptions...)
 	if err := driver.Start(); err != nil {
-		e.Logger.Error("Could not start chrome driver")
-		e.Logger.Fatal(err)
-		return
+		e.Logger.Error("Could not start chromedriver")
+		e.Logger.Error(err)
+		return 1
 	}
 	defer driver.Stop()
+	page, err := driver.NewPage()
+	if err != nil {
+		e.Logger.Error("Could not open page in chromedriver")
+		e.Logger.Error(err)
+		return 1
+	}
+	defer page.Destroy()
+	defer fmt.Println("Stopping server...")
 
-	// generate secret for json web token
-	jwtSecret := make([]byte, 16)
-	_, err := rand.Read(jwtSecret)
+	// get user id and password
+	if config.UserID == "" {
+		fmt.Print("AtCoder user id: ")
+		fmt.Scan(&config.UserID)
+	}
+	fmt.Print("AtCoder password: ")
+	password, err := gopass.GetPasswd()
+	if err != nil {
+		e.Logger.Error("Could not get password from input")
+		e.Logger.Error(err)
+		return 1
+	}
+
+	token, err := generateRandomString(8)
 	if err != nil {
 		e.Logger.Error("Could not generate server secret")
-		e.Logger.Fatal(err)
-		return
+		e.Logger.Error(err)
+		return 1
 	}
-	h := handlers.NewHandler(driver, jwtSecret)
+	h := handlers.NewHandler(page, config, token)
+
+	if err := handlers.Login(h, string(password)); err != nil {
+		e.Logger.Error("Failed to login to AtCoder. Please make suer your user id and password are correct.")
+		e.Logger.Error(err)
+		return 1
+	}
 
 	// Middlewares
 	e.Use(middleware.Logger())
-	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte(jwtSecret),
+
+	basicAuthConfig := middleware.BasicAuthConfig{
 		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/" || c.Path() == "/login" {
-				// Skip authentication for root and login requests
+			if c.Path() == "/" {
+				// Skip authentication for root endpoint
 				return true
 			}
 			return false
 		},
-	}))
+		Validator: func(authUserID, authToken string, c echo.Context) (bool, error) {
+			if authUserID == config.UserID && authToken == token {
+				return true, nil
+			}
+			return false, nil
+		},
+	}
+	e.Use(middleware.BasicAuthWithConfig(basicAuthConfig))
 
 	// Routes
 	e.GET("/", h.Root)
 
-	e.POST("/login", h.Login)
-	e.POST("/logout", h.Logout)
 	e.GET("/me", h.Me)
 
 	e.GET("/contests/:contestID", h.GetContest)
@@ -83,5 +153,16 @@ func main() {
 	// Start server
 	e.HideBanner = true
 	fmt.Println(banner)
-	e.Logger.Fatal(e.Start(":1323"))
+
+	fmt.Println("AuthToken:")
+	fmt.Println(token)
+	fmt.Println()
+
+	e.Logger.Fatal(e.Start(config.Host + ":" + config.Port))
+
+	return 0
+}
+
+func main() {
+	os.Exit(run())
 }

@@ -7,10 +7,8 @@ import (
 )
 
 type User struct {
-	ID       string `json:"id" yaml:"id"`
-	Name     string `json:"name" yaml:"name"`
-	Password string `json:"password,omitempty"`
-	Token    string `json:"token,omitempty" yaml:"token"`
+	ID   string `json:"id" yaml:"id"`
+	Name string `json:"name" yaml:"name"`
 }
 
 func (user *User) ToYaml() (string, error) {

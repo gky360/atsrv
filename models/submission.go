@@ -16,6 +16,7 @@ type Submission struct {
 	Time         int      `json:"time,omitempty" yaml:"time,omitempty"`
 	Memory       int      `json:"memory,omitempty" yaml:"memory,omitempty"`
 	CreatedAt    string   `json:"created_at" yaml:"created_at"`
+	Task         *Task    `json:"task,omitempty" yaml:"task,omitempty"`
 }
 
 func (sbm *Submission) ToYaml() (string, error) {

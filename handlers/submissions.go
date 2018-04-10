@@ -24,18 +24,14 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskName, err := paramContestTaskQ(c)
+	contestID, taskName, status, err := paramContestTaskQ(c)
 	if err != nil {
 		return err
 	}
 
-	page, err := getPage(h, user.ID)
-	if err != nil {
-		return err
-	}
 	taskID := ""
 	if taskName != "" {
-		tasksPage, err := pages.NewTasksPage(page, contestID)
+		tasksPage, err := pages.NewTasksPage(h.page, contestID)
 		if err != nil {
 			return err
 		}
@@ -44,7 +40,7 @@ func (h *Handler) GetSubmissions(c echo.Context) (err error) {
 			return err
 		}
 	}
-	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	sbmsPage, err := pages.NewSubmissionsPage(h.page, contestID, taskID, status, models.LangNone)
 	if err != nil {
 		return err
 	}
@@ -73,11 +69,7 @@ func (h *Handler) GetSubmission(c echo.Context) (err error) {
 		return err
 	}
 
-	page, err := getPage(h, user.ID)
-	if err != nil {
-		return err
-	}
-	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, "", models.LangNone)
+	sbmsPage, err := pages.NewSubmissionsPage(h.page, contestID, "", "", models.LangNone)
 	if err != nil {
 		return err
 	}
@@ -101,7 +93,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	}
 	c.Logger().Info(user.ID)
 
-	contestID, taskName, err := paramContestTaskQ(c)
+	contestID, taskName, _, err := paramContestTaskQ(c)
 	if err != nil {
 		return err
 	}
@@ -116,11 +108,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "source should not be empty.")
 	}
 
-	page, err := getPage(h, user.ID)
-	if err != nil {
-		return err
-	}
-	tasksPage, err := pages.NewTasksPage(page, contestID)
+	tasksPage, err := pages.NewTasksPage(h.page, contestID)
 	if err != nil {
 		return err
 	}
@@ -128,7 +116,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	taskPage, err := pages.NewTaskPage(page, contestID, taskID)
+	taskPage, err := pages.NewTaskPage(h.page, contestID, taskID)
 	if err != nil {
 		return err
 	}
@@ -136,7 +124,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 		return err
 	}
 
-	sbmsPage, err := pages.NewSubmissionsPage(page, contestID, taskID, models.LangNone)
+	sbmsPage, err := pages.NewSubmissionsPage(h.page, contestID, taskID, "", models.LangNone)
 	if err != nil {
 		return err
 	}
@@ -152,13 +140,14 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, sbms[0])
 }
 
-func paramContestTaskQ(c echo.Context) (contestID, taskName string, err error) {
+func paramContestTaskQ(c echo.Context) (contestID, taskName, status string, err error) {
 	contestID, err = paramContest(c)
 	if err != nil {
 		return
 	}
 
 	taskName = c.QueryParam("task_name")
+	status = c.QueryParam("status")
 	return
 }
 

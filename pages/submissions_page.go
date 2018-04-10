@@ -14,6 +14,7 @@ type SubmissionsPage struct {
 	page      *agouti.Page
 	contestID string
 	taskID    string
+	status    string
 	lang      models.Language
 }
 
@@ -28,6 +29,9 @@ func (p *SubmissionsPage) TargetPath() string {
 	if p.taskID != "" {
 		q.Set("f.Task", p.taskID)
 	}
+	if p.status != "" {
+		q.Set("f.Status", p.status)
+	}
 	if p.lang != models.LangNone {
 		q.Set("f.Language", strconv.Itoa(p.lang.Int()))
 	}
@@ -35,11 +39,12 @@ func (p *SubmissionsPage) TargetPath() string {
 	return u.String()
 }
 
-func NewSubmissionsPage(page *agouti.Page, contestID, taskID string, lang models.Language) (*SubmissionsPage, error) {
+func NewSubmissionsPage(page *agouti.Page, contestID, taskID, status string, lang models.Language) (*SubmissionsPage, error) {
 	p := &SubmissionsPage{
 		page,
 		contestID,
 		taskID,
+		status,
 		lang,
 	}
 	if err := To(p); err != nil {
@@ -86,6 +91,11 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 			return nil, err
 		}
 		sbmID, _ := strconv.Atoi(path.Base(sbmIDHref))
+		taskIDHref, err := sbmCols.At(1).Find("a").Attribute("href")
+		if err != nil {
+			return nil, err
+		}
+		taskID := path.Base(taskIDHref)
 
 		sbms[i] = &models.Submission{
 			ID:           sbmID,
@@ -94,6 +104,10 @@ func (p *SubmissionsPage) sbms() ([]*models.Submission, error) {
 			SourceLength: selectionToInt(sbmCols.At(5)),
 			Status:       selectionToStr(sbmCols.At(6).Find("span")),
 			CreatedAt:    selectionToStr(sbmCols.At(0)),
+			Task: models.NewTaskWithFullName(
+				taskID,
+				selectionToStr(sbmCols.At(1)),
+			),
 		}
 		if !isWJ {
 			sbms[i].Time = selectionToInt(sbmCols.At(7))
