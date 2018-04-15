@@ -124,7 +124,7 @@ func (h *Handler) PostSubmission(c echo.Context) (err error) {
 		return err
 	}
 
-	sbmsPage, err := pages.NewSubmissionsPage(h.page, contestID, taskID, "", models.LangNone)
+	sbmsPage, err := pages.NewSubmissionsPage(h.page, contestID, "", "", models.LangNone)
 	if err != nil {
 		return err
 	}
