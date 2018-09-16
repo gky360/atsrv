@@ -27,10 +27,12 @@ go get -u github.com/gky360/atsrv
 
 ## Usage
 
-1. Run `atsrv`
-2. Enter your password to login to AtCoder
-3. Copy generated auth token
-4. Set token to `atcli` with `atcli config -a xxxxxxxxxx`
+1. Generate auth token (like `cat /dev/urandom | base64 | fold -w 32 | head -n 1` )
+   and set it to environment variable ATSRV_AUTH_TOKEN.
+2. Set user id of AtCoder to environment variable ATSRV_USER_ID.
+3. Run `atsrv` .
+4. Enter your password to login to AtCoder.
+5. `atsrv` will start running.
 
 
 ## Endpoints
