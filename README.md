@@ -42,6 +42,7 @@ go get -u github.com/gky360/atsrv
 | GET  | n | / |
 | GET  | y | /me |
 | GET  | y | /contests/arc090 |
+| GET  | y | /contests/arc090?with_testcases_url=true |
 | POST | y | /contests/arc090/join |
 | GET  | y | /contests/arc090/tasks |
 | GET  | y | /contests/arc090/tasks?full=true |

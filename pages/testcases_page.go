@@ -37,7 +37,7 @@ func NewTestcasesPage(page *agouti.Page) (*TestcasesPage, error) {
 // Elements
 
 func (p *TestcasesPage) foldersBody() *agouti.Selection {
-	const selector = ".sl-grind-body"
+	const selector = ".sl-grid-body"
 	return p.page.Find(selector)
 }
 
@@ -48,7 +48,7 @@ func (p *TestcasesPage) folderLinks() *agouti.MultiSelection {
 
 // Values
 
-var ErrFolderNotFound = fmt.Errorf("contest testcases not found")
+var ErrTestcasesFolderNotFound = fmt.Errorf("contest testcases folder not found")
 
 func (p *TestcasesPage) contestFolderURL(contestID string) (string, error) {
 	normContestID := normalizeContestTestcasesFolderName(contestID)
@@ -63,7 +63,7 @@ func (p *TestcasesPage) contestFolderURL(contestID string) (string, error) {
 		}
 	}
 
-	return "", ErrFolderNotFound
+	return "", ErrTestcasesFolderNotFound
 }
 
 // Funcs

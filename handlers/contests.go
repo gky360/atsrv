@@ -20,6 +20,23 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
+	withTestcasesURL := (c.QueryParam("with_testcases_url") == "true")
+
+	testcasesURL := ""
+	if withTestcasesURL {
+		testcasesPage, err := getTestcasesPage(h)
+		if err != nil {
+			return err
+		}
+		testcasesURL, err = testcasesPage.GetContestFolderURL(contestID)
+		if err != nil {
+			if err == pages.ErrTestcasesFolderNotFound {
+				return echo.NewHTTPError(http.StatusUnprocessableEntity,
+					fmt.Sprintf("could not find testcases folder for contest %s", contestID))
+			}
+			return err
+		}
+	}
 
 	contestPage, err := getContestPage(h, contestID)
 	if err != nil {
@@ -28,6 +45,9 @@ func (h *Handler) GetContest(c echo.Context) (err error) {
 	contest, err := contestPage.GetContest()
 	if err != nil {
 		return err
+	}
+	if withTestcasesURL {
+		contest.TestcasesURL = testcasesURL
 	}
 
 	return c.JSON(http.StatusOK, contest)
@@ -79,4 +99,8 @@ func paramContest(c echo.Context) (string, error) {
 
 func getContestPage(h *Handler, contestID string) (*pages.ContestPage, error) {
 	return pages.NewContestPage(h.page, contestID)
+}
+
+func getTestcasesPage(h *Handler) (*pages.TestcasesPage, error) {
+	return pages.NewTestcasesPage(h.page)
 }
