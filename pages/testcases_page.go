@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/gky360/atsrv/constants"
@@ -59,7 +60,11 @@ func (p *TestcasesPage) contestFolderURL(contestID string) (string, error) {
 		folderName, _ := folderLink.Text()
 		normFolderName := normalizeContestTestcasesFolderName(folderName)
 		if strings.Contains(normFolderName, normContestID) {
-			return folderURL, nil
+			modifiedFolderURL, err := modifyFolderURLParam(folderURL)
+			if err != nil {
+				return "", err
+			}
+			return modifiedFolderURL, nil
 		}
 	}
 
@@ -71,6 +76,17 @@ func (p *TestcasesPage) contestFolderURL(contestID string) (string, error) {
 func normalizeContestTestcasesFolderName(name string) string {
 	r := strings.NewReplacer("-", "", "_", "")
 	return strings.ToLower(r.Replace(name))
+}
+
+func modifyFolderURLParam(folderURL string) (string, error) {
+	u, err := url.Parse(folderURL)
+	if err != nil {
+		return "", err
+	}
+	q := u.Query()
+	q.Set("dl", "1") // set `dl=1` to enable zip download
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }
 
 func (p *TestcasesPage) GetContestFolderURL(contestID string) (string, error) {
