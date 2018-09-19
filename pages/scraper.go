@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gky360/atsrv/constants"
 	"github.com/sclevine/agouti"
 )
 
@@ -17,11 +16,12 @@ const (
 
 type Scraper interface {
 	Page() *agouti.Page
+	Hostname() string
 	TargetPath() string
 }
 
 func TargetURL(s Scraper) string {
-	return "https://" + filepath.Join(constants.AtCoderHost, s.TargetPath())
+	return "https://" + filepath.Join(s.Hostname(), s.TargetPath())
 }
 
 func At(s Scraper) (bool, error) {
