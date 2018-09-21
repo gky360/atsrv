@@ -6,8 +6,10 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
+
+	"github.com/gky360/atsrv/constants"
+	"github.com/gky360/atsrv/models"
 )
 
 type SubmissionsPage struct {
@@ -20,6 +22,10 @@ type SubmissionsPage struct {
 
 func (p *SubmissionsPage) Page() *agouti.Page {
 	return p.page
+}
+
+func (p *SubmissionsPage) Hostname() string {
+	return constants.AtCoderHost
 }
 
 func (p *SubmissionsPage) TargetPath() string {

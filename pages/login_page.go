@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"github.com/gky360/atsrv/constants"
 	"github.com/sclevine/agouti"
 )
 
@@ -10,6 +11,10 @@ type LoginPage struct {
 
 func (p *LoginPage) Page() *agouti.Page {
 	return p.page
+}
+
+func (p *LoginPage) Hostname() string {
+	return constants.AtCoderHost
 }
 
 func (p *LoginPage) TargetPath() string {

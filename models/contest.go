@@ -7,8 +7,9 @@ import (
 )
 
 type Contest struct {
-	ID   string `json:"id" query:"id" yaml:"id"`
-	Name string `json:"name" query:"name" yaml:"name"`
+	ID           string `json:"id" query:"id" yaml:"id"`
+	Name         string `json:"name" query:"name" yaml:"name"`
+	TestcasesURL string `json:"testcases_url,omitempty" yaml:"testcases_url,omitempty"`
 }
 
 func (c *Contest) ToYaml() (string, error) {

@@ -88,7 +88,12 @@ func run() int {
 	defer page.Destroy()
 	defer fmt.Println("Stopping server...")
 
-	// get user id and password
+	// get auth token, user id and password
+	if config.AuthToken == "" {
+		e.Logger.Error("Set auth token to environment variable ATSRV_AUTH_TOKEN.\n" +
+			"ATSRV_AUTH_TOKEN is used to communicate with atcli.")
+		return 1
+	}
 	if config.UserID == "" {
 		fmt.Print("AtCoder user id: ")
 		fmt.Scan(&config.UserID)
@@ -101,13 +106,7 @@ func run() int {
 		return 1
 	}
 
-	token, err := generateRandomString(8)
-	if err != nil {
-		e.Logger.Error("Could not generate server secret")
-		e.Logger.Error(err)
-		return 1
-	}
-	h := handlers.NewHandler(page, config, token)
+	h := handlers.NewHandler(page, config)
 
 	if err := handlers.Login(h, string(password)); err != nil {
 		e.Logger.Error("Failed to login to AtCoder. Please make suer your user id and password are correct.")
@@ -127,7 +126,7 @@ func run() int {
 			return false
 		},
 		Validator: func(authUserID, authToken string, c echo.Context) (bool, error) {
-			if authUserID == config.UserID && authToken == token {
+			if authUserID == config.UserID && authToken == config.AuthToken {
 				return true, nil
 			}
 			return false, nil
@@ -153,9 +152,6 @@ func run() int {
 	// Start server
 	e.HideBanner = true
 	fmt.Println(banner)
-
-	fmt.Println("AuthToken:")
-	fmt.Println(token)
 	fmt.Println()
 
 	e.Logger.Fatal(e.Start(config.Host + ":" + config.Port))

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sclevine/agouti"
+
+	"github.com/gky360/atsrv/constants"
 	"github.com/gky360/atsrv/models"
 	"github.com/gky360/atsrv/modules"
-	"github.com/sclevine/agouti"
 )
 
 type ContestPage struct {
@@ -17,6 +19,10 @@ type ContestPage struct {
 
 func (p *ContestPage) Page() *agouti.Page {
 	return p.page
+}
+
+func (p *ContestPage) Hostname() string {
+	return constants.AtCoderHost
 }
 
 func (p *ContestPage) TargetPath() string {

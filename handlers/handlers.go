@@ -1,26 +1,27 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/sclevine/agouti"
-	"net/http"
 
 	"github.com/gky360/atsrv/constants"
 )
 
 type (
 	AtsrvConfig struct {
-		UserID   string `envconfig:"user_id"`
-		Host     string `default:""`
-		Port     string `default:"4700"`
-		Headless bool
-		Debug    bool
+		UserID    string `split_words:"true"`
+		AuthToken string `split_words:"true"`
+		Host      string `default:"localhost"`
+		Port      string `default:"4700"`
+		Headless  bool
+		Debug     bool
 	}
 
 	Handler struct {
 		page   *agouti.Page
 		config AtsrvConfig
-		token  string
 	}
 
 	RspRoot struct {
@@ -28,11 +29,10 @@ type (
 	}
 )
 
-func NewHandler(page *agouti.Page, config AtsrvConfig, token string) *Handler {
+func NewHandler(page *agouti.Page, config AtsrvConfig) *Handler {
 	return &Handler{
 		page:   page,
 		config: config,
-		token:  token,
 	}
 }
 

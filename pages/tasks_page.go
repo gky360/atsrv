@@ -5,8 +5,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/gky360/atsrv/models"
 	"github.com/sclevine/agouti"
+
+	"github.com/gky360/atsrv/constants"
+	"github.com/gky360/atsrv/models"
 )
 
 type TasksPage struct {
@@ -16,6 +18,10 @@ type TasksPage struct {
 
 func (p *TasksPage) Page() *agouti.Page {
 	return p.page
+}
+
+func (p *TasksPage) Hostname() string {
+	return constants.AtCoderHost
 }
 
 func (p *TasksPage) TargetPath() string {
