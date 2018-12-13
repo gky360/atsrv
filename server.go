@@ -65,9 +65,11 @@ func run() int {
 			"ATSRV_AUTH_TOKEN is used to communicate with atcli.")
 		return 1
 	}
+	fmt.Print("AtCoder user id : ")
 	if config.UserID == "" {
-		fmt.Print("AtCoder user id: ")
 		fmt.Scan(&config.UserID)
+	} else {
+		fmt.Println(config.UserID)
 	}
 	fmt.Print("AtCoder password: ")
 	password, err := gopass.GetPasswd()
