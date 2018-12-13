@@ -59,6 +59,24 @@ func run() int {
 		e.Logger.SetLevel(log.INFO)
 	}
 
+	// get auth token, user id and password
+	if config.AuthToken == "" {
+		e.Logger.Error("Set auth token to environment variable ATSRV_AUTH_TOKEN.\n" +
+			"ATSRV_AUTH_TOKEN is used to communicate with atcli.")
+		return 1
+	}
+	if config.UserID == "" {
+		fmt.Print("AtCoder user id: ")
+		fmt.Scan(&config.UserID)
+	}
+	fmt.Print("AtCoder password: ")
+	password, err := gopass.GetPasswd()
+	if err != nil {
+		e.Logger.Error("Could not get password from input")
+		e.Logger.Error(err)
+		return 1
+	}
+
 	chromeOptions := []agouti.Option{}
 	if config.Headless {
 		chromeOptions = append(chromeOptions, agouti.ChromeOptions(
@@ -87,24 +105,6 @@ func run() int {
 	}
 	defer page.Destroy()
 	defer fmt.Println("Stopping server...")
-
-	// get auth token, user id and password
-	if config.AuthToken == "" {
-		e.Logger.Error("Set auth token to environment variable ATSRV_AUTH_TOKEN.\n" +
-			"ATSRV_AUTH_TOKEN is used to communicate with atcli.")
-		return 1
-	}
-	if config.UserID == "" {
-		fmt.Print("AtCoder user id: ")
-		fmt.Scan(&config.UserID)
-	}
-	fmt.Print("AtCoder password: ")
-	password, err := gopass.GetPasswd()
-	if err != nil {
-		e.Logger.Error("Could not get password from input")
-		e.Logger.Error(err)
-		return 1
-	}
 
 	h := handlers.NewHandler(page, config)
 
