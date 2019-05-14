@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -28,22 +26,6 @@ var (
 %38s
 `, constants.Version)
 )
-
-func generateRandomBytes(n int) ([]byte, error) {
-	b := make([]byte, n)
-	_, err := rand.Read(b)
-	// Note that err == nil only if we read len(b) bytes.
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
-}
-
-func generateRandomString(n int) (string, error) {
-	b, err := generateRandomBytes(n)
-	return base64.URLEncoding.EncodeToString(b), err
-}
 
 func run() int {
 	e := echo.New()
@@ -98,14 +80,14 @@ func run() int {
 		e.Logger.Error(err)
 		return 1
 	}
-	defer driver.Stop()
+	defer func() { _ = driver.Stop() }()
 	page, err := driver.NewPage()
 	if err != nil {
 		e.Logger.Error("Could not open page in chromedriver")
 		e.Logger.Error(err)
 		return 1
 	}
-	defer page.Destroy()
+	defer func() { _ = page.Destroy() }()
 	defer fmt.Println("Stopping server...")
 
 	h := handlers.NewHandler(page, config)
@@ -121,11 +103,8 @@ func run() int {
 
 	basicAuthConfig := middleware.BasicAuthConfig{
 		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/" {
-				// Skip authentication for root endpoint
-				return true
-			}
-			return false
+			// Skip authentication for root endpoint
+			return c.Path() == "/"
 		},
 		Validator: func(authUserID, authToken string, c echo.Context) (bool, error) {
 			if authUserID == config.UserID && authToken == config.AuthToken {
