@@ -26,15 +26,15 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:73c5062c19c602b4d279b581b0ee3ffe43f61bfc37e91885b89190154bb5e909"
+  digest = "1:efd601ad1d1189884f37ed075fadb5bbd17f1f5acf5862827247c6da56d125ba"
   name = "github.com/labstack/echo"
   packages = [
     ".",
     "middleware",
   ]
   pruneopts = "UT"
-  revision = "c7eb8da9ec73e78c4f38413f3f835e0cd52c7d72"
-  version = "v3.3.8"
+  revision = "38772c686c76b501f94bd6cd5b77f5842e93b559"
+  version = "v3.3.10"
 
 [[projects]]
   digest = "1:764bce605f1c70823a567ac3205a03e6b7f375ca747d8820fded0b0abddda802"
@@ -50,20 +50,20 @@
   version = "v0.2.8"
 
 [[projects]]
-  digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
+  digest = "1:2fa7b0155cd54479a755c629de26f888a918e13f8857a2c442205d825368e084"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   pruneopts = "UT"
-  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
-  version = "v0.0.9"
+  revision = "3a70a971f94a22f2fa562ffcc7a0eb45f5daf045"
+  version = "v0.1.1"
 
 [[projects]]
-  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
+  digest = "1:e150b5fafbd7607e2d638e4e5cf43aa4100124e5593385147b0a74e2733d8b0d"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
-  version = "v0.0.4"
+  revision = "c2a7a6ca930a4cd0bc33a3f298eb71960732a3a7"
+  version = "v0.0.7"
 
 [[projects]]
   digest = "1:bc35ac5e7bdb176249a6ed5b44e858740b28454d458bb1a4a350bea2df7b5b14"
@@ -89,16 +89,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:268b8bce0064e8c057d7b913605459f9a26dcab864c0886a56d196540fbf003f"
+  digest = "1:4d29fdc69817829d8c78473d61613d984ce59675110cee7a2f0314f332cc70a2"
   name = "github.com/valyala/fasttemplate"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
+  revision = "8b5e4e491ab636663841c42ea3c5a9adebabaf36"
+  version = "v1.0.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:cea8a31af44e77908c71e68561ce2e5992cf08d3ec29a3f9007f90c9b29bd001"
+  digest = "1:1d7d0f593d88f430fe7faf41e0803b9ffa899aebb8160f3b5076b448b16ed111"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
@@ -106,18 +106,51 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
 
 [[projects]]
   branch = "master"
-  digest = "1:206c5fc6c77857fea5eebcf4ceb2db7272f269428456160589910e50d14244db"
+  digest = "1:15a159ca3e34c429f800dd822cbb37707e98552c9523b8d07fdd244dba62f04b"
+  name = "golang.org/x/net"
+  packages = ["idna"]
+  pruneopts = "UT"
+  revision = "3ec19112720433827bbce8be9342797f5a6aaaf9"
+
+[[projects]]
+  branch = "master"
+  digest = "1:b0cf0a23da8288b6d1ec9187e87f95d6e957f50f41b62f06b4eefaa01d4e8d7a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "b05ddf57801d2239d6ab0ee35f9d981e0420f4ac"
+  revision = "3a4b5fb9f71f5874b2374ae059bc0e0bcb52e145"
+
+[[projects]]
+  digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/language",
+    "internal/language/compact",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+  ]
+  pruneopts = "UT"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
