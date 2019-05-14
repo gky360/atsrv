@@ -1,5 +1,9 @@
 # atsrv
 
+[![Build Status](https://travis-ci.com/gky360/atsrv.svg?branch=master)](https://travis-ci.com/gky360/atsrv)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/gky360/atsrv?branch=master&svg=true)](https://ci.appveyor.com/project/gky360/atsrv)
+[![GoDoc](https://godoc.org/github.com/gky360/atsrv?status.svg)](https://godoc.org/github.com/gky360/atsrv)
+
 ```
         __
        /\ \__
