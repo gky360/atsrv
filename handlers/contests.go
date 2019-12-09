@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gky360/atsrv/pages"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func (h *Handler) GetContest(c echo.Context) (err error) {
