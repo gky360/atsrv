@@ -6,7 +6,7 @@ import (
 
 	"github.com/gky360/atsrv/models"
 	"github.com/gky360/atsrv/pages"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sclevine/agouti"
 )
 
