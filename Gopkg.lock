@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0778dc7fce1b4669a8bfa7ae506ec1f595b6ab0f8989c1c0d22a8ca1144e9972"
+  digest = "1:cf83673642ffa03117e29f15af249195b0280e0ad5e5177d3a08fafed8f3634f"
   name = "github.com/howeyc/gopass"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bf9dde6d0d2c004a008c27aaee91170c786f6db8"
+  revision = "7cb4b85ec19c7c220ab71433a230f7eb200d639d"
 
 [[projects]]
   digest = "1:fd9bea48bbc5bba66d9891c72af7255fbebecdff845c37c679406174ece5ca1b"
@@ -37,7 +37,7 @@
   version = "v3.3.10"
 
 [[projects]]
-  digest = "1:764bce605f1c70823a567ac3205a03e6b7f375ca747d8820fded0b0abddda802"
+  digest = "1:6e15357cae900fa1a8015c7fc9efdb406f72b644549a3422f3f1b7f465836a84"
   name = "github.com/labstack/gommon"
   packages = [
     "bytes",
@@ -46,24 +46,24 @@
     "random",
   ]
   pruneopts = "UT"
-  revision = "7fd9f68ece0bcb1a905fac8f1549f0083f71c51b"
-  version = "v0.2.8"
+  revision = "ab0bfd9a5eba33a8c364bf3390d809ed23c31f97"
+  version = "v0.2.9"
 
 [[projects]]
-  digest = "1:7c084e0e780596dd2a7e20d25803909a9a43689c153de953520dfbc0b0e51166"
+  digest = "1:4a29eeb25603debe8f2098a9902c4d3851034cf70d33be428826e86e8c30a1b0"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8029fb3788e5a4a9c00e415f586a6d033f5d38b3"
-  version = "v0.1.2"
+  revision = "98ec13f34aabf44cc914c65a1cfb7b9bc815aef1"
+  version = "v0.1.4"
 
 [[projects]]
-  digest = "1:9b90c7639a41697f3d4ad12d7d67dfacc9a7a4a6e0bbfae4fc72d0da57c28871"
+  digest = "1:d62282425ffb75047679d7e2c3b980eea7f82c05ef5fb9142ee617ebac6e7432"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1311e847b0cb909da63b5fecfb5370aa66236465"
-  version = "v0.0.8"
+  revision = "88ba11cfdc67c7588b30042edf244b2875f892b6"
+  version = "v0.0.10"
 
 [[projects]]
   digest = "1:bc35ac5e7bdb176249a6ed5b44e858740b28454d458bb1a4a350bea2df7b5b14"
@@ -89,16 +89,16 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:4d29fdc69817829d8c78473d61613d984ce59675110cee7a2f0314f332cc70a2"
+  digest = "1:d2b6739022f7bc284b94fc553ddd2ff790de7b0fc0b37206e8bff80481a1d7aa"
   name = "github.com/valyala/fasttemplate"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8b5e4e491ab636663841c42ea3c5a9adebabaf36"
-  version = "v1.0.1"
+  revision = "8fcc7a99b5795b7c3e95172237cf93282fc339a9"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:1d7d0f593d88f430fe7faf41e0803b9ffa899aebb8160f3b5076b448b16ed111"
+  digest = "1:c7aa9bb2473a4b13633ca39df90273b776246c27ace7c1af75adc98811a82775"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
@@ -106,26 +106,26 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
+  revision = "e9b2fee46413994441b28dfca259d911d963dfed"
 
 [[projects]]
   branch = "master"
-  digest = "1:15a159ca3e34c429f800dd822cbb37707e98552c9523b8d07fdd244dba62f04b"
+  digest = "1:d1f7edf951b9cc444358a31de2f4e4c1c5c539ea9c6aca13f5bf92eb1124fc4b"
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "UT"
-  revision = "f3200d17e092c607f615320ecaad13d87ad9a2b3"
+  revision = "e7e4b65ae66375ec1e85afc8e6b9b4933ae4da81"
 
 [[projects]]
   branch = "master"
-  digest = "1:c79c407099598f99bada27ce2a07210a67a75b7294947ab3f981e735d9295c22"
+  digest = "1:8191c209ac2aaba9e958a061256fab8955ad10cc731aa609660184800f1ef55a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "791d8a0f4d093bd8fe272dea2cd28991154796fb"
+  revision = "eeba5f6aabab6d6594a9191d6bfeaca5fa6a8248"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -153,12 +153,12 @@
   version = "v0.3.2"
 
 [[projects]]
-  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
+  digest = "1:b75b3deb2bce8bc079e16bb2aecfe01eb80098f5650f9e93e5643ca8b7b73737"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
-  version = "v2.2.2"
+  revision = "1f64d6156d11335c3f22d9330b0ad14fc1e789ce"
+  version = "v2.2.7"
 
 [solve-meta]
   analyzer-name = "dep"

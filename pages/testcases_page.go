@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gky360/atsrv/constants"
 	"github.com/sclevine/agouti"
@@ -32,6 +33,8 @@ func NewTestcasesPage(page *agouti.Page) (*TestcasesPage, error) {
 	if err := To(p); err != nil {
 		return nil, err
 	}
+	// wait for Dropbox to load list of folders
+	time.Sleep(3 * time.Second)
 	return p, nil
 }
 
