@@ -3,15 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"syscall"
 
 	"github.com/gky360/atsrv/constants"
 	"github.com/gky360/atsrv/handlers"
-	"github.com/howeyc/gopass"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/sclevine/agouti"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -54,12 +55,13 @@ func run() int {
 		fmt.Println(config.UserID)
 	}
 	fmt.Print("AtCoder password: ")
-	password, err := gopass.GetPasswd()
+	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		e.Logger.Error("Could not get password from input")
 		e.Logger.Error(err)
 		return 1
 	}
+	password := string(bytePassword)
 
 	chromeOptions := []agouti.Option{}
 	if config.Headless {
