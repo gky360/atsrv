@@ -14,9 +14,6 @@ install:
   - go env
   - gcc --version
 
-  - go get -u github.com/golang/dep/...
-  - dep ensure -v
-
 build: off
 
 test_script:
