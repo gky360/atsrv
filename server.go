@@ -95,7 +95,7 @@ func run() int {
 	h := handlers.NewHandler(page, config)
 
 	if err := handlers.Login(h, string(password)); err != nil {
-		e.Logger.Error("Failed to login to AtCoder. Please make suer your user id and password are correct.")
+		e.Logger.Error("Failed to login to AtCoder. Please make sure your user id and password are correct.")
 		e.Logger.Error(err)
 		return 1
 	}
