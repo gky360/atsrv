@@ -51,12 +51,12 @@ func (p *TaskPage) statement() *agouti.Selection {
 	const selector = "#main-container #task-statement"
 	const JaSelector = selector + " > .lang .lang-ja"
 	sel := p.page.Find(JaSelector)
-	if _, err := sel.Count(); err != nil {
-		// element not found
-		// this is for old contests
-		sel = p.page.All(selector).At(0)
+	if _, err := sel.Count(); err == nil {
+		return sel
 	}
-	return sel
+	// element not found
+	// this is for old contests
+	return p.page.All(selector).At(0)
 }
 
 func (p *TaskPage) scoreSpan() *agouti.Selection {
@@ -66,12 +66,18 @@ func (p *TaskPage) scoreSpan() *agouti.Selection {
 
 func (p *TaskPage) samplePres() *agouti.MultiSelection {
 	const xpath = ".//*[contains(@class, 'part')]//section//pre[contains(@id, 'pre-sample')]"
-	return p.statement().AllByXPath(xpath)
+	sels := p.statement().AllByXPath(xpath)
+	if cnt, err := sels.Count(); err == nil && cnt > 0 {
+		return sels
+	}
+	// element not found
+	// this is for old contests
+	const selectorOld = ".part section pre.prettyprint.linenums"
+	return p.statement().All(selectorOld)
 }
 
 func (p *TaskPage) samplePre(index int) *agouti.Selection {
-	selector := fmt.Sprintf(".part section pre#pre-sample%d", index)
-	return p.statement().Find(selector)
+	return p.samplePres().At(index)
 }
 
 func (p *TaskPage) sbmForm() *agouti.Selection {
